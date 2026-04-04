@@ -53,12 +53,11 @@ const userSchema = new mongoose.Schema(
                 ref: "Loop"
             }
         ],
-        story: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Story"
-            }
-        ]
+        story: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Story"
+        }
+
     },
     { timestamps: true });
 
