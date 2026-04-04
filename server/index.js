@@ -10,8 +10,8 @@ app.get('/', (req, res) => {
     res.send('<h1>Server is Live!</h1>');
 });
 
-app.listen(port, () => {
-    connectDB();
+app.listen(port, async () => {
+    await connectDB();
     console.log(`Server is running on http://localhost:${port}`);
 });
 
