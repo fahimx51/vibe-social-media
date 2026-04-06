@@ -37,7 +37,7 @@ export const signUp = async (req, res) => {
             sameSite: "Lax"
         });
 
-        res.status(201).json({ message: "User created successfully", user, token });
+        res.status(201).json({ message: "User created successfully", user });
 
     }
     catch (error) {
@@ -70,7 +70,7 @@ export const signIn = async (req, res) => {
             sameSite: "Lax"
         });
 
-        res.status(201).json({ message: "User signed in successfully", user, token });
+        res.status(201).json({ message: "User signed in successfully", user });
 
     }
     catch (error) {
