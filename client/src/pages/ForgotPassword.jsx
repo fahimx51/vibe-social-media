@@ -1,9 +1,11 @@
+import axios from 'axios';
 import React, { useState } from 'react'
 import { ClipLoader } from "react-spinners"
+import { serverUrl } from '../App';
 
 export default function ForgotPassword() {
 
-    const [step, setStep] = useState(3);
+    const [step, setStep] = useState(1);
 
     const [email, setEmail] = useState("");
     const [otp, setOtp] = useState("");
@@ -26,6 +28,68 @@ export default function ForgotPassword() {
             ...prev,
             [field]: isFocused || value.length > 0
         }));
+    };
+
+
+    const handleStep1 = async () => {
+
+        setLoading(true);
+
+        try {
+            const result = await axios.post(`${serverUrl}/api/auth/sendOtp`, { email }, { withCredentials: true });
+            console.log(result.data);
+            setStep(2);
+        }
+
+        catch (error) {
+            console.log(error.message);
+        }
+
+        finally {
+            setLoading(false);
+        }
+    };
+
+    const handleStep2 = async () => {
+
+        setLoading(true);
+
+        try {
+
+            if (password !== confirmPassword) {
+                return console.log("Password doesn't matched!");
+            }
+
+            const result = await axios.post(`${serverUrl}/api/auth/verifyOtp`, { email, otp }, { withCredentials: true });
+            console.log(result.data);
+
+            setStep(3);
+        }
+
+        catch (error) {
+            console.log(error.message);
+        }
+
+        finally {
+            setLoading(false);
+        }
+    };
+
+    const handleStep3 = async () => {
+
+        setLoading(true);
+
+        try {
+            const result = await axios.post(`${serverUrl}/api/auth/resetPassword`, { email, password }, { withCredentials: true });
+            console.log(result.data);
+        }
+        catch (error) {
+            console.log(error.message);
+        }
+
+        finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -54,7 +118,7 @@ export default function ForgotPassword() {
                     </div>
 
                     <button
-                        // onClick={}
+                        onClick={handleStep1}
                         disabled={loading}
                         className='w-[90%] h-[50px] bg-[#1a1f23] text-white rounded-2xl font-semibold text-[16px] hover:bg-black transition duration-300 cursor-pointer mb-4'>
                         {loading ? <ClipLoader size={25} color='white' /> : "Send OTP"}
@@ -85,7 +149,7 @@ export default function ForgotPassword() {
                     </div>
 
                     <button
-                        // onClick={}
+                        onClick={handleStep2}
                         disabled={loading}
                         className='w-[90%] h-[50px] bg-[#1a1f23] text-white rounded-2xl font-semibold text-[16px] hover:bg-black transition duration-300 cursor-pointer mb-4'>
                         {loading ? <ClipLoader size={25} color='white' /> : "Submit"}
@@ -108,6 +172,7 @@ export default function ForgotPassword() {
                             Enter a new password
                         </label>
                         <input
+                            minLength={6}
                             type="text" id="password" required
                             onChange={(e) => setPassword(e.target.value)}
                             onFocus={() => handleToggleLabel('password', true, '')}
@@ -119,22 +184,27 @@ export default function ForgotPassword() {
 
                     {/* Confirm Password Field  */}
 
-                    <div className='relative w-[90%] h-[50px] mt-[5px] border-2 border-black rounded-2xl mb-4'>
+                    <div className='relative w-[90%] h-[50px] border-2 border-black rounded-2xl mb-10'>
                         <label htmlFor="password" className={`absolute left-[20px] bg-white px-1 text-gray-700 transition-all duration-300 ease-in-out pointer-events-none ${inputClicked.confirmPassword ? 'top-[-12px] text-[13px] z-10' : 'top-[12px] text-[15px] z-0'}`}>
                             Confirm password
                         </label>
                         <input
+                            minLength={6}
                             type="text" id="password" required
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             onFocus={() => handleToggleLabel('confirmPassword', true, '')}
                             onBlur={(e) => handleToggleLabel('confirmPassword', false, e.target.value)}
-                            className='w-full h-full rounded-2xl px-[20px] outline-none border-0 bg-transparent'
+                            className='w-full h-full rounded-2xl px-[20px] mb-2 outline-none border-0 bg-transparent'
                         />
+
+                        {
+                            password !== confirmPassword && confirmPassword !== "" && <p className='text-red-600 text-sm font-semibold'>Password doesn't match!</p>
+                        }
 
                     </div>
 
                     <button
-                        // onClick={}
+                        onClick={handleStep3}
                         disabled={loading}
                         className='w-[90%] h-[50px] bg-[#1a1f23] text-white rounded-2xl font-semibold text-[16px] hover:bg-black transition duration-300 cursor-pointer mb-4'>
                         {loading ? <ClipLoader size={25} color='white' /> : "Submit"}
