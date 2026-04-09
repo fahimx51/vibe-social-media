@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
 import logo_black from '../assets/logo_black.png'
+import logo_white from '../assets/logo_white.png'
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import axios from 'axios';
 import { serverUrl } from '../App';
+import { ClipLoader } from "react-spinners"
+import { Link } from 'react-router-dom';
 
 export default function SignUp() {
     const [inputClicked, setInputClicked] = useState({
@@ -18,6 +21,7 @@ export default function SignUp() {
     const [userName, setUserName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
 
 
     // Reusable function to handle focus/blur logic
@@ -30,6 +34,9 @@ export default function SignUp() {
 
 
     const handleSignUp = async () => {
+
+        setLoading(true);
+
         try {
             const result = await axios.post(`${serverUrl}/api/auth/signUp`, { name, userName, email, password }, { withCredentials: true });
             console.log(result.data);
@@ -37,12 +44,16 @@ export default function SignUp() {
         catch (error) {
             console.log('Internal error', error.message);
         }
+        finally {
+            setLoading(false);
+        }
     };
 
     return (
         <div className='w-full h-screen bg-gradient-to-b from-black to-gray-900 flex flex-col justify-center items-center'>
             <div className='w-[90%] lg:max-w-[60%] h-[600px] bg-white rounded-2xl flex justify-center items-center overflow-hidden border-2 border-[#1a1f23]'>
 
+                {/* Left Side   */}
                 <div className='w-full lg:w-[50%] h-full bg-white flex flex-col items-center p-[10px] gap-[20px]'>
 
                     <div className='flex gap-[10px] items-center text-[20px] font-semibold mt-[40px]'>
@@ -114,16 +125,18 @@ export default function SignUp() {
 
                     <button
                         onClick={handleSignUp}
+                        disabled={loading}
                         className='w-[90%] h-[50px] bg-[#1a1f23] text-white rounded-2xl mt-[20px] font-semibold text-[16px] hover:bg-black transition duration-300 cursor-pointer'>
-                        Sign Up
+                        {loading ? <ClipLoader size={25} color='white' /> : "Sign Up"}
                     </button>
 
-                    <p className='text-gray-800 text-sm'>Already have an account? <a href="/login" className='text-blue-500 hover:underline'>Sign In</a></p>
+                    <p className='text-gray-800 text-sm'>Already have an account? <Link to='/signIn' className='text-blue-700 hover:border-b font-semibold'>Sign In</Link></p>
                 </div>
 
                 {/* Right side decoration */}
-                <div className='lg:w-[50%] h-full hidden lg:flex justify-center items-center bg-black rounded-l-[30px] shadow-2xl'>
-                    {/* Put an image or text here later */}
+                <div className='lg:w-[50%] h-full hidden lg:flex flex-col gap-[10px] justify-center items-center bg-black rounded-l-[30px] shadow-2xl text-white font-semibold'>
+                    <img src={logo_white} alt="Vibe Logo" className='w-[50%]' />
+                    <p>Your world, your rhythm, your people</p>
                 </div>
             </div>
         </div>
