@@ -8,6 +8,6 @@ authRouter.post("/signIn", signIn);
 authRouter.post("/sendOtp", sendOtp);
 authRouter.post("/verifyOtp", verifyOtp);
 authRouter.post("/resetPassword", resetPassword);
-authRouter.get("/signOut", signOut);
+authRouter.post("/signOut", signOut);
 
 export default authRouter;

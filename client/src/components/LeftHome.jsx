@@ -2,18 +2,32 @@ import React from 'react'
 import logo_white from '../assets/logo_white.png'
 import { FaRegHeart } from 'react-icons/fa'
 import maleDP from '../assets/dp.jpeg'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import axios from 'axios'
+import { serverUrl } from '../App';
+import { setUserData } from '../redux/userSlice'
 
 export default function LeftHome() {
 
     const { userData } = useSelector(state => state.user);
+    const dispatch = useDispatch();
+
+    const handleLogout = async () => {
+        try {
+            const result = await axios.post(`${serverUrl}/api/auth/signOut`, {}, { withCredentials: true });
+            dispatch(setUserData(null));
+        }
+        catch (error) {
+            console.log(error.message);
+        }
+    };
 
     return (
         <div className='w-[25%] hidden lg:block min-h-screen bg-gray-950 border-r-2 border-gray-900 px-5'>
             <div className='w-full h-[100px] flex items-center justify-between'>
                 <img src={logo_white} alt="" className='w-20' />
                 <div>
-                    <FaRegHeart className='w-[25px] h-[25px] text-white' />
+                    <FaRegHeart className='w-[25px] h-[25px] text-white cursor-pointer' />
                 </div>
             </div>
 
@@ -27,7 +41,7 @@ export default function LeftHome() {
                         <div className='text-[15px] text-gray-400'> {userData.userName} </div>
                     </div>
                 </div>
-                <div className='text-blue-500 font-semibold cursor-pointer'>
+                <div onClick={handleLogout} className='text-blue-500 font-semibold cursor-pointer'>
                     Logout
                 </div>
             </div>
