@@ -6,6 +6,8 @@ import axios from 'axios';
 import { serverUrl } from '../App';
 import { ClipLoader } from "react-spinners"
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setUserData } from '../redux/userSlice';
 
 export default function SignUp() {
     const [inputClicked, setInputClicked] = useState({
@@ -25,6 +27,8 @@ export default function SignUp() {
 
     const [error, setError] = useState(null);
 
+    const dispatch = useDispatch();
+
 
     // Reusable function to handle focus/blur logic
     const handleToggleLabel = (field, isFocused, value) => {
@@ -42,7 +46,8 @@ export default function SignUp() {
 
         try {
             const result = await axios.post(`${serverUrl}/api/auth/signUp`, { name, userName, email, password }, { withCredentials: true });
-            console.log(result.data);
+            console.log(result.data.user);
+            dispatch(setUserData(result.data.user));
         }
         catch (error) {
             console.log('Internal error', error.response?.data?.message);
