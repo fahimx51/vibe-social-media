@@ -20,6 +20,7 @@ export default function SignIp() {
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
 
     // Reusable function to handle focus/blur logic
@@ -34,13 +35,15 @@ export default function SignIp() {
     const handleSignIn = async () => {
 
         setLoading(true);
+        setError(null);
 
         try {
             const result = await axios.post(`${serverUrl}/api/auth/signIn`, { userName, password }, { withCredentials: true });
             console.log(result.data);
         }
         catch (error) {
-            console.log('Internal error', error.message);
+            console.log('Internal error :', error.response?.data?.message);
+            setError(error.response?.data?.message);
         }
         finally {
             setLoading(false);
@@ -103,6 +106,10 @@ export default function SignIp() {
                         </Link>
                     </div>
 
+                    {/* Error  */}
+                    {
+                        error && <p className='mb-3 text-red-600'>{error}</p>
+                    }
                     <button
                         onClick={handleSignIn}
                         disabled={loading}

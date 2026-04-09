@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useState } from 'react'
 import { ClipLoader } from "react-spinners"
 import { serverUrl } from '../App';
+import { useNavigate } from 'react-router-dom';
 
 export default function ForgotPassword() {
 
@@ -13,6 +14,7 @@ export default function ForgotPassword() {
     const [confirmPassword, setConfirmPassword] = useState("");
 
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     const [inputClicked, setInputClicked] = useState({
 
@@ -22,6 +24,8 @@ export default function ForgotPassword() {
         confirmPassword: false
 
     });
+
+    const navigate = useNavigate();
 
     const handleToggleLabel = (field, isFocused, value) => {
         setInputClicked(prev => ({
@@ -34,6 +38,7 @@ export default function ForgotPassword() {
     const handleStep1 = async () => {
 
         setLoading(true);
+        setError(null);
 
         try {
             const result = await axios.post(`${serverUrl}/api/auth/sendOtp`, { email }, { withCredentials: true });
@@ -42,7 +47,8 @@ export default function ForgotPassword() {
         }
 
         catch (error) {
-            console.log(error.message);
+            console.log(error.response?.data?.message);
+            setError(error.response?.data?.message);
         }
 
         finally {
@@ -53,12 +59,9 @@ export default function ForgotPassword() {
     const handleStep2 = async () => {
 
         setLoading(true);
+        setError(null);
 
         try {
-
-            if (password !== confirmPassword) {
-                return console.log("Password doesn't matched!");
-            }
 
             const result = await axios.post(`${serverUrl}/api/auth/verifyOtp`, { email, otp }, { withCredentials: true });
             console.log(result.data);
@@ -67,7 +70,8 @@ export default function ForgotPassword() {
         }
 
         catch (error) {
-            console.log(error.message);
+            console.log(error.response?.data?.message);
+            setError(error.response?.data?.message);
         }
 
         finally {
@@ -78,13 +82,20 @@ export default function ForgotPassword() {
     const handleStep3 = async () => {
 
         setLoading(true);
+        setError(null);
 
         try {
+            if (password !== confirmPassword) {
+                return setError("Password doesn't matched!");
+            }
+
             const result = await axios.post(`${serverUrl}/api/auth/resetPassword`, { email, password }, { withCredentials: true });
             console.log(result.data);
+            navigate('/signIn');
         }
         catch (error) {
-            console.log(error.message);
+            console.log(error.response?.data?.message);
+            setError(error.response?.data?.message);
         }
 
         finally {
@@ -117,6 +128,10 @@ export default function ForgotPassword() {
 
                     </div>
 
+                    {
+                        error && <p className='mb-3 text-red-600'>{error}</p>
+                    }
+
                     <button
                         onClick={handleStep1}
                         disabled={loading}
@@ -147,6 +162,10 @@ export default function ForgotPassword() {
                         />
 
                     </div>
+
+                    {
+                        error && <p className='mb-3 text-red-600'>{error}</p>
+                    }
 
                     <button
                         onClick={handleStep2}
@@ -184,7 +203,7 @@ export default function ForgotPassword() {
 
                     {/* Confirm Password Field  */}
 
-                    <div className='relative w-[90%] h-[50px] border-2 border-black rounded-2xl mb-10'>
+                    <div className='relative w-[90%] h-[50px] border-2 border-black rounded-2xl mb-5'>
                         <label htmlFor="password" className={`absolute left-[20px] bg-white px-1 text-gray-700 transition-all duration-300 ease-in-out pointer-events-none ${inputClicked.confirmPassword ? 'top-[-12px] text-[13px] z-10' : 'top-[12px] text-[15px] z-0'}`}>
                             Confirm password
                         </label>
@@ -197,11 +216,11 @@ export default function ForgotPassword() {
                             className='w-full h-full rounded-2xl px-[20px] mb-2 outline-none border-0 bg-transparent'
                         />
 
-                        {
-                            password !== confirmPassword && confirmPassword !== "" && <p className='text-red-600 text-sm font-semibold'>Password doesn't match!</p>
-                        }
-
                     </div>
+
+                    {
+                        error && <p className='mb-3 text-red-600'>{error}</p>
+                    }
 
                     <button
                         onClick={handleStep3}
