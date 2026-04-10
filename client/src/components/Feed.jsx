@@ -6,7 +6,7 @@ import Navbar from './Navbar'
 
 export default function Feed() {
     return (
-        <div className='lg:w-[50%] w-full bg-gray-950 min-h-screen lg:h-screen relative lg:overflow-y-auto px-5 pt-5'>
+        <div className='lg:w-[50%] w-full bg-gray-950 min-h-screen lg:h-screen relative lg:overflow-y-auto px-5 pt-5 no-scrollbar'>
             <div className='w-full h-[100px] flex items-center justify-between lg:hidden'>
                 <img src={logo_white} alt="" className='w-20' />
                 <div>
