@@ -6,12 +6,14 @@ import ForgotPassword from './pages/ForgotPassword'
 import Home from './pages/Home'
 import { useSelector } from 'react-redux'
 import GetCurrentUser from './hooks/GetCurrentUser'
+import GetSuggestedUser from './hooks/GetSuggestedUser'
 
 export const serverUrl = "http://localhost:8000"
 
 export default function App() {
 
   GetCurrentUser();
+  GetSuggestedUser();
 
   const { userData, isCheckingAuth } = useSelector(state => state.user);
 

@@ -6,15 +6,17 @@ import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import { serverUrl } from '../App';
 import { setUserData } from '../redux/userSlice'
+import OtherUser from './OtherUser'
 
 export default function LeftHome() {
 
-    const { userData } = useSelector(state => state.user);
+    const { userData, suggestedUsers } = useSelector(state => state.user);
     const dispatch = useDispatch();
+
 
     const handleLogout = async () => {
         try {
-            const result = await axios.post(`${serverUrl}/api/auth/signOut`, {}, { withCredentials: true });
+            await axios.post(`${serverUrl}/api/auth/signOut`, {}, { withCredentials: true });
             dispatch(setUserData(null));
         }
         catch (error) {
@@ -31,9 +33,9 @@ export default function LeftHome() {
                 </div>
             </div>
 
-            <div className='flex items-center justify-between gap-2.5 w-full'>
+            <div className='flex items-center justify-between gap-2.5 w-full border-b-2 border-b-gray-900 py-3.5'>
                 <div className='flex items-center gap-[10px]'>
-                    <div className='w-15 h-15 border-2 border-blue-400 rounded-full cursor-pointer overflow-hidden'>
+                    <div className='w-12 h-12 border-2 border-blue-400 rounded-full cursor-pointer overflow-hidden'>
                         <img src={userData?.profileImage || maleDP} alt="" className='w-full object-cover object-center' />
                     </div>
                     <div>
@@ -45,6 +47,16 @@ export default function LeftHome() {
                     Logout
                 </div>
             </div>
+
+            <div className='w-full flex flex-col gap-5 p-5 '>
+                <h1 className='text-white text-lg'>Suggested Users</h1>
+                {
+                    suggestedUsers && suggestedUsers.slice(0, 3).map((user) => {
+                        return <OtherUser key={user._id} user={user} />
+                    })
+                }
+            </div>
+
         </div >
     )
 }

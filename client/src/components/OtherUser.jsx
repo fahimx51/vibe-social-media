@@ -1,0 +1,22 @@
+import React from 'react'
+import maleDP from '../assets/dp.jpeg'
+
+export default function OtherUser({ user }) {
+    return (
+        <div className='w-full h-[80px] flex items-center justify-between border-b border-gray-800'>
+            <div className='flex items-center gap-[10px]'>
+                <div className='w-12 h-12 border-2 border-blue-400 rounded-full cursor-pointer overflow-hidden'>
+                    <img src={user?.profileImage || maleDP} alt="" className='w-full object-cover object-center' />
+                </div>
+                <div>
+                    <div className='text-[18px] text-white font-semibold'>{user.name}</div>
+                    <div className='text-[15px] text-gray-400'> {user.userName} </div>
+                </div>
+            </div>
+
+            <button className='px-[10px] w-25 py-[5px] h-10 bg-white rounded-2xl'>
+                Follow
+            </button>
+        </div>
+    )
+}
