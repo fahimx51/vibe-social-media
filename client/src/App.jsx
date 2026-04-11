@@ -7,6 +7,8 @@ import Home from './pages/Home'
 import { useSelector } from 'react-redux'
 import GetCurrentUser from './hooks/GetCurrentUser'
 import GetSuggestedUser from './hooks/GetSuggestedUser'
+import Profile from './pages/Profile'
+import EditProfile from './pages/EditProfile'
 
 export const serverUrl = "http://localhost:8000"
 
@@ -24,19 +26,20 @@ export default function App() {
 
   return (
     <Routes>
-      {/* If userData exists, REDIRECT to "/", otherwise show SignIn */}
+
       <Route path='/signIn' element={userData ? <Navigate to="/" /> : <SignIn />} />
 
-      {/* If userData exists, REDIRECT to "/", otherwise show SignUp */}
       <Route path='/signUp' element={userData ? <Navigate to="/" /> : <SignUp />} />
 
       <Route path='/forgot-password' element={userData ? <Navigate to="/" /> : <ForgotPassword />} />
 
-      {/* Main Home Route */}
       <Route path='/' element={userData ? <Home /> : <Navigate to="/signIn" />} />
 
-      {/* Optional: Catch-all route for 404s */}
       <Route path='*' element={<Navigate to="/" />} />
+
+      <Route path='/profile/:userName' element={userData ? <Profile /> : <Navigate to="/signIn" />} />
+      <Route path='/edit-profile' element={userData ? <EditProfile /> : <Navigate to="/signIn" />} />
+
     </Routes>
   )
 }

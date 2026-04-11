@@ -12,7 +12,7 @@ export default function GetCurrentUser() {
         const fetchUser = async () => {
             try {
                 const result = await axios.get(`${serverUrl}/api/user/current`, { withCredentials: true });
-                dispatch(setUserData(result.data.user || result.data));
+                dispatch(setUserData(result.data));
             }
             catch (error) {
                 console.log(error.message);

@@ -12,7 +12,8 @@ export default function GetSuggestedUser() {
         const fetchUser = async () => {
             try {
                 const result = await axios.get(`${serverUrl}/api/user/suggestedUsers`, { withCredentials: true });
-                dispatch(setSuggestedUsers(result.data.users));
+                // console.log(result.data);
+                dispatch(setSuggestedUsers(result.data));
             }
             catch (error) {
                 console.log(error.message);
