@@ -22,8 +22,13 @@ const loopSchema = new mongoose.Schema(
         ],
         comments: [
             {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "User"
+                author: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "User"
+                },
+                text: {
+                    type: String
+                }
             }
         ]
     },

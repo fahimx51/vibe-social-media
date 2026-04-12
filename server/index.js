@@ -6,6 +6,8 @@ import cookieParser from 'cookie-parser';
 import authRouter from './routes/auth.routes.js';
 import userRouter from './routes/user.routes.js';
 import postRouter from './routes/post.routes.js';
+import loopRouter from './routes/loop.routes.js';
+import storyRouter from './routes/story.routes.js';
 
 dotenv.config();
 const app = express();
@@ -27,6 +29,8 @@ app.get('/', (req, res) => {
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/posts", postRouter);
+app.use("/api/loops", loopRouter);
+app.use("/api/story", storyRouter);
 
 app.listen(port, async () => {
     await connectDB();
