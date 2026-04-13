@@ -7,6 +7,7 @@ import { setProfileData, setUserData } from '../redux/userSlice';
 import { IoArrowBack } from "react-icons/io5";
 import maleDP from '../assets/dp.jpeg'
 import Navbar from '../components/Navbar';
+import FollowButton from '../components/FollowButton';
 
 
 export default function Profile() {
@@ -15,7 +16,6 @@ export default function Profile() {
     const dispatch = useDispatch();
     const { profileData, userData } = useSelector(state => state.user);
     const navigate = useNavigate();
-
 
     const handleProfile = async () => {
         try {
@@ -69,17 +69,15 @@ export default function Profile() {
                 </div>
 
                 <div>
-                    <div className='flex items-center justify-center gap-[40px]'>
+                    <div className={`flex items-center justify-center gap-0 ${profileData?.followers.length === 1 && 'gap-[10px]'}  ${profileData?.followers.length === 2 && 'gap-[20px]'}
+                     ${profileData?.followers.length >= 3 && 'gap-[40px]'}`}>
                         <div className='flex relative'>
-                            <div className='w-10 h-10 rounded-full border-2 border-gray-950 cursor-pointer overflow-hidden'>
-                                <img src={profileData?.profileImage || maleDP} alt="" className='w-full h-full object-cover object-center' />
-                            </div>
-                            <div className='w-10 h-10 absolute left-4 border-2 border-gray-950 rounded-full cursor-pointer overflow-hidden'>
-                                <img src={profileData?.profileImage || maleDP} alt="" className='w-full h-full object-cover object-center' />
-                            </div>
-                            <div className='w-10 h-10 absolute left-8 border-2 border-gray-950 rounded-full cursor-pointer overflow-hidden'>
-                                <img src={profileData?.profileImage || maleDP} alt="" className='w-full h-full object-cover object-center' />
-                            </div>
+                            {
+                                profileData?.followers.slice(0, 3).map((profile, index) =>
+                                    <div key={index} className={`w-10 h-10 rounded-full border-2 border-gray-950 cursor-pointer overflow-hidden ${index > 0 && 'absolute'} ${index == 1 && 'left-4'} ${index == 2 && 'left-8'} `}>
+                                        <img src={profile?.profileImage || maleDP} alt="" className='w-full h-full object-cover object-center' />
+                                    </div>
+                                )}
                         </div>
                         <div className='text-white text-[22px] md:text-[30px] font-semibold'>{profileData?.followers?.length}</div>
                     </div>
@@ -87,19 +85,17 @@ export default function Profile() {
                 </div>
 
                 <div>
-                    <div className='flex items-center justify-center gap-[40px]'>
+                    <div className={`flex items-center justify-center gap-0 ${profileData?.following.length == 1 && 'gap-[10px]'}  ${profileData?.following.length == 2 && 'gap-[20px]'}
+                     ${profileData?.following.length >= 3 && 'gap-[40px]'}`}>
                         <div className='flex relative'>
-                            <div className='w-10 h-10 rounded-full border-2 border-gray-950 cursor-pointer overflow-hidden'>
-                                <img src={profileData?.profileImage || maleDP} alt="" className='w-full h-full object-cover object-center' />
-                            </div>
-                            <div className='w-10 h-10 absolute left-4 border-2 border-gray-950 rounded-full cursor-pointer overflow-hidden'>
-                                <img src={profileData?.profileImage || maleDP} alt="" className='w-full h-full object-cover object-center' />
-                            </div>
-                            <div className='w-10 h-10 absolute left-8 border-2 border-gray-950 rounded-full cursor-pointer overflow-hidden'>
-                                <img src={profileData?.profileImage || maleDP} alt="" className='w-full h-full object-cover object-center' />
-                            </div>
+                            {
+                                profileData?.following.slice(0, 3).map((profile, index) =>
+                                    <div key={index} className={`w-10 h-10 rounded-full border-2 border-gray-950 cursor-pointer overflow-hidden ${index > 0 && 'absolute'} ${index == 1 && 'left-4'} ${index == 2 && 'left-8'} `}>
+                                        <img src={profile?.profileImage || maleDP} alt="" className='w-full h-full object-cover object-center' />
+                                    </div>
+                                )}
                         </div>
-                        <div className='text-white text-[22px] md:text-[30px] font-semibold'>{profileData?.following?.length}</div>
+                        <div className='text-white text-[22px] md:text-[30px] font-semibold'>{profileData?.following.length}</div>
                     </div>
                     <div className='text-[18px] md:text-[22px] text-[#ffffffc7]'>Following</div>
                 </div>
@@ -115,7 +111,7 @@ export default function Profile() {
                     profileData?._id != userData?._id &&
 
                     <>
-                        <button className='px-[10px] min-w-[150px] py-[5px] h-[40px] bg-white cursor-pointer rounded-2xl '>Follow</button>
+                        <FollowButton targetUserId={profileData?._id} tailwind={'px-[10px] min-w-[150px] py-[5px] h-[40px] bg-white cursor-pointer rounded-2xl '} />
                         <button className='px-[10px] min-w-[150px] py-[5px] h-[40px] bg-white cursor-pointer rounded-2xl '>Message</button>
                     </>
                 }

@@ -6,7 +6,7 @@ const userSlice = createSlice({
         userData: null,
         isCheckingAuth: true,
         suggestedUsers: null,
-        profileData: null
+        profileData: null,
     },
     reducers: {
         setUserData: (state, action) => {
@@ -21,7 +21,7 @@ const userSlice = createSlice({
         },
         setProfileData: (state, action) => {
             state.profileData = action.payload;
-        }
+        },
     }
 })
 

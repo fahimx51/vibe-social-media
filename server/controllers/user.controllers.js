@@ -5,7 +5,7 @@ export const getCurrentUser = async (req, res) => {
     try {
         const userId = req.userId;
 
-        const user = await User.findById(userId).populate("posts loops");
+        const user = await User.findById(userId).populate("posts followers following loops");
 
         if (!user) {
             return res.status(400).json({ message: "User not found" });
@@ -81,11 +81,14 @@ export const editProfile = async (req, res) => {
 export const getProfile = async (req, res) => {
     try {
         const { userName } = req.params;
-        const user = await User.findOne({ userName }).select("-password");
+        const user = await User.findOne({ userName }).select("-password")
+            .populate("followers following posts loops")
 
         if (!user) {
             return res.status(400).json({ message: "User not found!" });
         }
+
+
 
         res.status(200).json(user);
 
@@ -93,5 +96,55 @@ export const getProfile = async (req, res) => {
     catch (error) {
         console.log("User not found in getProfile controller :", error.message);
         res.status(500).json({ message: `get profile error : ${error.message}` });
+    }
+}
+
+export const follow = async (req, res) => {
+    try {
+        const currUserId = req.userId;
+        const targetUserId = req.params.targetUserId;
+
+        if (!targetUserId) {
+            return res.status(400).json({ message: "target user is missing" });
+        }
+
+        if (currUserId == targetUserId) {
+            return res.status(400).json({ message: "You can't follow yourself" });
+        }
+
+        const currUser = await User.findById(currUserId);
+        const targetUser = await User.findById(targetUserId);
+
+        const isFollowing = currUser.following.includes(targetUserId);
+
+        if (isFollowing) {
+            currUser.following = currUser.following.filter(id => id.toString() != targetUserId);
+            targetUser.followers = targetUser.followers.filter(id => id.toString() != currUserId);
+
+            await currUser.populate("followers following posts loops")
+            await targetUser.populate("followers following posts loops")
+
+            await currUser.save();
+            await targetUser.save();
+
+            res.status(200).json({ user: currUser, target: targetUser });
+        }
+        else {
+            currUser.following.push(targetUserId);
+            targetUser.followers.push(currUserId);
+
+            await currUser.populate("followers following posts loops")
+            await targetUser.populate("followers following posts loops")
+
+            await currUser.save();
+            await targetUser.save();
+
+
+            res.status(200).json({ user: currUser, target: targetUser });
+        }
+    }
+    catch (error) {
+        console.log("follow controller error :", error.message);
+        res.status(500).json({ message: `error in follow controller : ${error.message}` });
     }
 }

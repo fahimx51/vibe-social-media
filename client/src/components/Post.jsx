@@ -11,6 +11,7 @@ import { serverUrl } from '../App';
 import { setPostData } from '../redux/postSlice';
 import { useNavigate } from 'react-router-dom';
 import { setUserData } from '../redux/userSlice';
+import FollowButton from './FollowButton';
 
 export default function Post({ post }) {
 
@@ -27,6 +28,7 @@ export default function Post({ post }) {
         try {
             const result = await axios.post(`${serverUrl}/api/posts/like/${post._id}`, {}, { withCredentials: true });
             const updatedPost = result.data;
+            console.log(updatedPost);
 
             const updatedPosts = postData.map(p => p?._id == post?._id ? updatedPost : p);
 
@@ -62,6 +64,7 @@ export default function Post({ post }) {
         }
     }
 
+
     return (
         <div className='w-[90%] min-h-[450px] flex flex-col gap-[10px] bg-white items-center shadow-2xl shadow-[#00000058] rounded-2xl'>
             <div className='w-full h-[80px] flex justify-between items-center px-[10px]'>
@@ -73,7 +76,11 @@ export default function Post({ post }) {
                         {post?.author?.userName}
                     </div>
                 </div>
-                <button className='px-[10px] w-[80px] md:w-[100px] py-[5px] h-[30px] md:h-[40px] bg-gray-950 text-white rounded-2xl text-[14px] md:text-[16px]'>Follow</button>
+                {
+                    userData._id != post.author._id &&
+                    <FollowButton targetUserId={post.author._id} tailwind={'px-[10px] w-[80px] md:w-[100px] py-[5px] h-[30px] md:h-[40px] bg-gray-950 text-white rounded-2xl text-[14px] md:text-[16px]'} />
+
+                }
             </div>
 
 
@@ -129,7 +136,7 @@ export default function Post({ post }) {
             </div>
             {
                 showComment &&
-                <div className='flex flex-col w-full gap-[30px] pb-[20px]'>
+                <div className='flex flex-col w-full pb-[20px]'>
                     <div className='w-full h-[80px] flex items-center justify-between px-[20px] relative'>
                         <div className='w-10 h-10 md:w-12 md:h-12 border-2 border-blue-400 rounded-full cursor-pointer overflow-hidden' onClick={() => navigate(`/profile/${userData.userName}`)}>
                             <img src={post?.author?.profileImage || maleDP} alt="" className='w-full h-full object-cover object-center' />
@@ -138,11 +145,11 @@ export default function Post({ post }) {
                         <button onClick={handleComment} className='absolute right-[20px] cursor-pointer'> <FiSend className='h-[25px] w-[25px]' /> </button>
                     </div>
 
-                    <div className='w-full max-w-[300px] overflow-auto'>
+                    <div className='w-[90%] mx-auto overflow-auto'>
                         {
                             post.comments.map((comment, index) =>
-                                <div key={index} className='w-full px-[20px] py-[20px] flex items-center flex items-center gap-[20px] border-b-2 border-b-gray-200'>
-                                    <div className='w-10 h-10 md:w-12 md:h-12 border-2 border-blue-400 rounded-full cursor-pointer overflow-hidden' onClick={() => navigate(`/profile/${userData.userName}`)}>
+                                <div key={index} className='w-full px-[20px] py-[20px] flex items-center flex items-center gap-[20px] border-b border-b-gray-100'>
+                                    <div className='w-8 h-8 md:w-10 md:h-10 border-2 border-blue-400 rounded-full cursor-pointer overflow-hidden' onClick={() => navigate(`/profile/${userData.userName}`)}>
                                         <img src={comment?.author?.profileImage || maleDP} alt="" className='w-full h-full object-cover object-center' />
                                     </div>
                                     <div>

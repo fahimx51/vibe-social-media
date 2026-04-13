@@ -1,6 +1,7 @@
 import React from 'react'
 import maleDP from '../assets/dp.jpeg'
 import { useNavigate } from 'react-router-dom'
+import FollowButton from './FollowButton';
 
 export default function OtherUser({ user }) {
 
@@ -18,9 +19,8 @@ export default function OtherUser({ user }) {
                 </div>
             </div>
 
-            <button className='px-[10px] w-25 py-[5px] h-10 bg-white rounded-2xl'>
-                Follow
-            </button>
+            <FollowButton targetUserId={user._id} tailwind={'px-[10px] w-25 py-[5px] h-10 bg-white rounded-2xl'} />
+            
         </div>
     )
 }
