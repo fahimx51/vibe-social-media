@@ -7,8 +7,8 @@ const postRouter = express.Router();
 
 postRouter.post("/upload", isAuth, upload.single('media'), uploadPost);
 postRouter.get("/getAllPosts", isAuth, getAllPosts);
-postRouter.get("/like/:postId", isAuth, like);
-postRouter.get("/saved/:postId", isAuth, saved);
+postRouter.post("/like/:postId", isAuth, like);
+postRouter.post("/saved/:postId", isAuth, saved);
 postRouter.post("/comment/:postId", isAuth, comment);
 
 export default postRouter;

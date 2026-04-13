@@ -4,7 +4,7 @@ import { SlVolume2, SlVolumeOff } from "react-icons/sl";
 export default function VideoPlayer({ media }) {
 
     const videoTag = useRef();
-    const [mute, setMute] = useState(false);
+    const [mute, setMute] = useState(true);
     const [isPlaying, setIsPlaying] = useState(false);
 
     const handleVideoClick = () => {

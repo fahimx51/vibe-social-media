@@ -10,6 +10,7 @@ import GetSuggestedUser from './hooks/GetSuggestedUser'
 import Profile from './pages/Profile'
 import EditProfile from './pages/EditProfile'
 import Upload from './pages/Upload'
+import GetAllPost from './hooks/GetAllPost'
 
 export const serverUrl = "http://localhost:8000"
 
@@ -17,6 +18,7 @@ export default function App() {
 
   GetCurrentUser();
   GetSuggestedUser();
+  GetAllPost();
 
   const { userData, isCheckingAuth } = useSelector(state => state.user);
 

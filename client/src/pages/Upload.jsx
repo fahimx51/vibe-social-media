@@ -5,6 +5,11 @@ import { BsPlusSquare } from "react-icons/bs";
 import VideoPlayer from '../components/VideoPlayer';
 import axios from 'axios';
 import { serverUrl } from '../App';
+import { useDispatch, useSelector } from 'react-redux';
+import { setPostData } from '../redux/postSlice';
+import { setStoryData } from '../redux/storySlice';
+import { setLoopData } from '../redux/loopSlice';
+import { ClipLoader } from "react-spinners"
 
 export default function Upload() {
 
@@ -14,8 +19,15 @@ export default function Upload() {
     const [backendMedia, setBackendMedia] = useState(null);
     const [mediaType, setMediaType] = useState(null);
     const [caption, setCaption] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const mediaInput = useRef();
+
+    const dispatch = useDispatch();
+
+    const { postData } = useSelector(state => state.post);
+    const { storyData } = useSelector(state => state.story);
+    const { loopData } = useSelector(state => state.loop);
 
     const handleMediaOnChange = async (e) => {
         const file = e.target.files[0];
@@ -31,21 +43,29 @@ export default function Upload() {
     };
 
     const uploadPost = async () => {
+
         try {
             const formData = new FormData();
-            formData.append("text", caption);
+            formData.append("caption", caption);
             formData.append("mediaType", mediaType);
             formData.append("media", backendMedia);
 
             const result = await axios.post(`${serverUrl}/api/posts/upload`, formData, { withCredentials: true });
 
+            dispatch(setPostData([...postData, result.data]));
+
             console.log(result);
+            navigate('/');
         }
         catch (error) {
             console.log("error occur when upload post", error.message);
         }
+        finally {
+            setLoading(false);
+        }
     };
     const uploadStory = async () => {
+
         try {
             const formData = new FormData();
             formData.append("mediaType", mediaType);
@@ -53,30 +73,44 @@ export default function Upload() {
 
             const result = await axios.post(`${serverUrl}/api/story/upload`, formData, { withCredentials: true });
 
+            dispatch(setStoryData([...storyData, result.data]))
             console.log(result);
+            navigate('/');
         }
         catch (error) {
             console.log("error occur when upload post", error.message);
+        }
+        finally {
+            setLoading(false);
         }
     };
 
     const uploadLoop = async () => {
+
         try {
             const formData = new FormData();
 
-            formData.append("text", caption);
+            formData.append("caption", caption);
             formData.append("media", backendMedia);
 
             const result = await axios.post(`${serverUrl}/api/loops/upload`, formData, { withCredentials: true });
 
+            dispatch(setLoopData([...loopData, result.data]));
+
             console.log(result);
+            navigate('/');
         }
         catch (error) {
             console.log("error occur when upload post", error.message);
         }
+        finally {
+            setLoading(false);
+        }
     };
 
     const handleUpload = () => {
+        setLoading(true);
+
         if (uploadType === 'Post') {
             uploadPost();
         }
@@ -144,6 +178,8 @@ export default function Upload() {
                                 uploadType !== "Story" &&
                                 <input
                                     type="text"
+                                    value={caption}
+                                    onChange={(e) => setCaption(e.target.value)}
                                     placeholder='Enter a caption'
                                     required
                                     className='w-full border-b-gray-400 border-b-2 outline-none px-[10px] py-[5px] text-white mt-[20px]'
@@ -176,7 +212,10 @@ export default function Upload() {
                 <button
                     onClick={handleUpload}
                     className='px-[10px] w-[60%] max-w-[400px] py-[5px] h-[50px] bg-white mt-[50px] cursor-pointer rounded-2xl font-semibold'>
-                    Upload {uploadType}
+                    {
+                        loading ? <ClipLoader size={30} color='black' /> :
+                            `Upload ${uploadType}`
+                    }
                 </button>
             }
 
