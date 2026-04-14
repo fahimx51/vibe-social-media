@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { SlVolume2, SlVolumeOff } from "react-icons/sl";
 
 export default function VideoPlayer({ media }) {
@@ -6,6 +6,28 @@ export default function VideoPlayer({ media }) {
     const videoTag = useRef();
     const [mute, setMute] = useState(true);
     const [isPlaying, setIsPlaying] = useState(false);
+
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(([entry]) => {
+            const video = videoTag.current;
+            if (entry.isIntersecting) {
+                video.play();
+            }
+            else {
+                video.pause();
+            }
+        }, { threshold: 0.6 });
+
+        if (videoTag.current) {
+
+            observer.observe(videoTag.current);
+        }
+
+        return () => {
+            if (videoTag.current) observer.unobserve(videoTag.current);
+        }
+    }, [])
 
     const handleVideoClick = () => {
         if (isPlaying) {

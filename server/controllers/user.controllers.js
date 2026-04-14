@@ -5,16 +5,40 @@ export const getCurrentUser = async (req, res) => {
     try {
         const userId = req.userId;
 
-        const user = await User.findById(userId).populate("posts followers following loops");
+        const user = await User.findById(userId)
+            .select("-password")
+            .populate("followers following loops")
+            // 1. Populate your own posts with their comments
+            .populate({
+                path: "posts",
+                populate: {
+                    path: "comments.author",
+                    select: "userName profileImage"
+                }
+            })
+            // 2. Populate savedPosts WITH comments and authors
+            .populate({
+                path: "savedPosts",
+                populate: [
+                    {
+                        path: "author",
+                        select: "userName profileImage"
+                    },
+                    {
+                        path: "comments.author", // This adds comments to saved posts
+                        select: "userName profileImage"
+                    }
+                ]
+            });
 
         if (!user) {
-            return res.status(400).json({ message: "User not found" });
+            return res.status(404).json({ message: "User not found" });
         }
 
         res.status(200).json(user);
     }
     catch (error) {
-        console.log("Error in getCurrentUser:", error);
+        console.log("Error in getCurrentUser:", error.message);
         res.status(500).json({ message: `Get current user error: ${error.message}` });
     }
 }
@@ -124,6 +148,9 @@ export const follow = async (req, res) => {
             await currUser.populate("followers following posts loops")
             await targetUser.populate("followers following posts loops")
 
+            await currUser.populate("savedPosts.author", "name userName profileImage");
+            await targetUser.populate("savedPosts.author", "name userName profileImage");
+
             await currUser.save();
             await targetUser.save();
 
@@ -133,8 +160,11 @@ export const follow = async (req, res) => {
             currUser.following.push(targetUserId);
             targetUser.followers.push(currUserId);
 
-            await currUser.populate("followers following posts loops")
-            await targetUser.populate("followers following posts loops")
+            await currUser.populate("followers following posts loops savedPosts")
+            await targetUser.populate("followers following posts loops savedPosts")
+
+            await currUser.populate("savedPosts.author", "name userName profileImage");
+            await targetUser.populate("savedPosts.author", "name userName profileImage");
 
             await currUser.save();
             await targetUser.save();

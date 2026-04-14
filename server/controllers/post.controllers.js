@@ -105,26 +105,44 @@ export const comment = async (req, res) => {
 export const saved = async (req, res) => {
     try {
         const postId = req.params.postId;
-
         const user = await User.findById(req.userId);
 
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        // Toggle Logic
         const alreadySaved = user.savedPosts.some(id => id.toString() === postId.toString());
 
         if (alreadySaved) {
-            user.savedPosts = user.savedPosts.filter(id => id.toString() !== postId.toString())
-        }
-        else {
+            user.savedPosts = user.savedPosts.filter(id => id.toString() !== postId.toString());
+        } else {
             user.savedPosts.push(postId);
         }
 
         await user.save();
-        await user.populate("savedPosts");
+
+        // CORRECT WAY to populate an existing document instance:
+        await user.populate([
+            { path: "followers following loops", select: "name userName profileImage" },
+            {
+                path: "posts",
+                populate: {
+                    path: "comments.author",
+                    select: "userName profileImage"
+                }
+            },
+            {
+                path: "savedPosts",
+                populate: [
+                    { path: "author", select: "userName profileImage" },
+                    { path: "comments.author", select: "userName profileImage" }
+                ]
+            }
+        ]);
 
         res.status(200).json(user);
     }
     catch (error) {
-        console.log("Error in get saved controller : ", error.message);
+        console.log("Error in saved controller:", error.message);
         res.status(500).json({ message: error.message });
     }
-}
-
+};

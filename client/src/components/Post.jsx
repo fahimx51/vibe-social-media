@@ -23,7 +23,6 @@ export default function Post({ post }) {
     const dispatch = useDispatch();
     const { postData } = useSelector(state => state.post);
 
-
     const handleLike = async () => {
         try {
             const result = await axios.post(`${serverUrl}/api/posts/like/${post._id}`, {}, { withCredentials: true });
@@ -33,6 +32,7 @@ export default function Post({ post }) {
             const updatedPosts = postData.map(p => p?._id == post?._id ? updatedPost : p);
 
             dispatch(setPostData(updatedPosts));
+            dispatch(setUserData({ ...userData, savedPosts: updatedPosts }));
         }
         catch (error) {
             console.log("error in like handler", error);
@@ -46,6 +46,7 @@ export default function Post({ post }) {
 
             const updatedPosts = postData.map(p => p?._id == post?._id ? updatedPost : p);
             dispatch(setPostData(updatedPosts));
+            dispatch(setUserData({ ...userData, savedPosts: updatedPosts }));
             setComment("");
         }
         catch (error) {
@@ -77,7 +78,7 @@ export default function Post({ post }) {
                     </div>
                 </div>
                 {
-                    userData._id != post.author._id &&
+                    userData?._id != post.author._id &&
                     <FollowButton targetUserId={post.author._id} tailwind={'px-[10px] w-[80px] md:w-[100px] py-[5px] h-[30px] md:h-[40px] bg-gray-950 text-white rounded-2xl text-[14px] md:text-[16px]'} />
 
                 }
@@ -161,8 +162,6 @@ export default function Post({ post }) {
                     </div>
                 </div>
             }
-
-
 
         </div>
     )

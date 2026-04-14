@@ -1,5 +1,5 @@
 import axios from 'axios'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { serverUrl } from '../App'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,6 +8,7 @@ import { IoArrowBack } from "react-icons/io5";
 import maleDP from '../assets/dp.jpeg'
 import Navbar from '../components/Navbar';
 import FollowButton from '../components/FollowButton';
+import Post from '../components/Post';
 
 
 export default function Profile() {
@@ -15,7 +16,10 @@ export default function Profile() {
     const { userName } = useParams();
     const dispatch = useDispatch();
     const { profileData, userData } = useSelector(state => state.user);
+    const { postData } = useSelector(state => state.post);
     const navigate = useNavigate();
+
+    const [postType, setPostType] = useState("Posts");
 
     const handleProfile = async () => {
         try {
@@ -44,7 +48,7 @@ export default function Profile() {
     };
 
     return (
-        <div className='w-full min-h-screen bg-gray-950'>
+        <div className='w-full min-h-screen bg-gray-900'>
             <div className='w-full h-[80px] flex justify-between items-center px-[30px] text-white'>
                 <div onClick={() => navigate('/')} ><IoArrowBack className='w-9 h-9 cursor-pointer' /></div>
                 <div className='font-semibold text-[20px]'>{profileData?.userName}</div>
@@ -118,10 +122,44 @@ export default function Profile() {
             </div>
 
             <div className='w-full min-h-screen flex justify-center'>
-                <div className='w-full max-w-[900px] flex flex-col items-center rounded-t-[30px] bg-white relative gap-[20px] pt-[30px]'>
+                <div className='w-full max-w-[900px] flex flex-col items-center rounded-t-[30px] bg-white relative gap-[20px] pt-[30px] pb-30'>
+
+                    {
+                        profileData?._id == userData?._id
+                        &&
+                        <div className='w-[90%] max-w-[600px] h-[80px] bg-white/90 rounded-full flex justify-center items-center gap-[20px]'>
+                            <div
+                                onClick={() => setPostType("Posts")}
+                                className={`${postType === "Posts" ? "bg-gray-900 rounded-full text-white shadow-2xl shadow-gray-900" : ""} w-[28%] h-[80%] flex justify-center items-center text-[14px] md:text-[19px] font-semibold hover:bg-gray-900 rounded-full hover:text-white cursor-pointer hover:shadow-2xl hover:shadow-gray-900`}
+                            >
+                                Posts
+                            </div>
+
+                            <div
+                                onClick={() => setPostType("Saved Posts")}
+                                className={`${postType === "Saved Posts" ? "bg-gray-900 rounded-full text-white shadow-2xl shadow-gray-900" : ""} w-[28%] h-[80%] flex justify-center items-center text-[14px] md:text-[19px] font-semibold hover:bg-gray-900 rounded-full hover:text-white cursor-pointer hover:shadow-2xl hover:shadow-gray-900`}
+                            >
+                                Saved
+                            </div>
+
+                        </div>
+                    }
+
                     <Navbar />
+                    {
+
+                        postType == "Posts" ?
+                            postData?.map((post, index) =>
+                                post?.author._id === profileData?._id && < Post key={index} post={post} />
+                            )
+                            :
+                            userData?.savedPosts.map((post, index) =>
+                                < Post key={index} post={post} />
+                            )
+                    }
                 </div>
             </div>
+
         </div>
     )
 }

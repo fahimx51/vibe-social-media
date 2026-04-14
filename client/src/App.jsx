@@ -11,6 +11,8 @@ import Profile from './pages/Profile'
 import EditProfile from './pages/EditProfile'
 import Upload from './pages/Upload'
 import GetAllPost from './hooks/GetAllPost'
+import Loops from './pages/Loops'
+import GetAllLoops from './hooks/GetAllLoops'
 
 export const serverUrl = "http://localhost:8000"
 
@@ -19,6 +21,8 @@ export default function App() {
   GetCurrentUser();
   GetSuggestedUser();
   GetAllPost();
+  GetAllLoops();
+  
 
   const { userData, isCheckingAuth } = useSelector(state => state.user);
 
@@ -45,6 +49,8 @@ export default function App() {
       <Route path='/upload' element={userData ? <Upload /> : <Navigate to="/signIn" />} />
 
       <Route path='/edit-profile' element={userData ? <EditProfile /> : <Navigate to="/signIn" />} />
+
+      <Route path='/loops' element={userData ? <Loops /> : <Navigate to="/signIn" />} />
 
     </Routes>
   )

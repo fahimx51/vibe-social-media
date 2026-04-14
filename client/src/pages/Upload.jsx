@@ -130,7 +130,7 @@ export default function Upload() {
             </div>
 
             <div className='w-[90%] max-w-[600px] h-[80px] bg-white/90 rounded-full flex justify-around items-center gap-[10px]'>
-                <input type="file" hidden ref={mediaInput} onChange={handleMediaOnChange} />
+                <input type="file" accept={uploadType == "Loop" ? "video/*" : ""} hidden ref={mediaInput} onChange={handleMediaOnChange} />
                 <div
                     onClick={() => setUploadType("Post")}
                     className={`${uploadType === "Post" ? "bg-gray-950 rounded-full text-white shadow-2xl shadow-gray-950" : ""} w-[28%] h-[80%] flex justify-center items-center text-[19px] font-semibold hover:bg-gray-950 rounded-full hover:text-white cursor-pointer hover:shadow-2xl hover:shadow-gray-950`}
