@@ -4,7 +4,18 @@ import uploadOnCloudinary from '../config/cloudinary.js';
 
 export const getAllLoops = async (req, res) => {
     try {
-        const loops = await Loop.find({}).populate("author", "name userName, profileImage").populate("comments.author");
+        const loops = await Loop.find({})
+            .populate([
+                {
+                    path: "author",
+                    select: "userName profileImage"
+                },
+                {
+                    path: "comments.author",
+                    select: "userName profileImage"
+                }
+            ]).sort({ createdAt: -1 }); // Optional: Show newest loops first
+
         res.status(200).json(loops);
     }
     catch (error) {
@@ -34,7 +45,16 @@ export const uploadLoop = async (req, res) => {
         user.loops.push(loop._id);
         await user.save();
 
-        const populatedLoop = await Loop.findById(loop._id).populate("author", "name userName, profileImage");
+        const populatedLoop = await loop.populate([
+            {
+                path: "author",
+                select: "userName profileImage"
+            },
+            {
+                path: "comments.author",
+                select: "userName profileImage"
+            }
+        ]).sort({ createdAt: -1 });
 
         res.status(201).json(populatedLoop);
     }
@@ -56,15 +76,26 @@ export const like = async (req, res) => {
         const alreadyLiked = loop.likes.some(id => id.toString() === req.userId.toString());
 
         if (alreadyLiked) {
-            post.likes = loop.likes.filter(id => id.toString() !== req.userId.toString())
+            loop.likes = loop.likes.filter(id => id.toString() !== req.userId.toString())
         }
         else {
             loop.likes.push(req.userId);
         }
 
+        loop.comments.sort((a, b) => b._id.getTimestamp() - a._id.getTimestamp());
+
         await loop.save();
 
-        await loop.populate("author", "name userName, profileImage");
+        await loop.populate([
+            {
+                path: "author",
+                select: "userName profileImage"
+            },
+            {
+                path: "comments.author",
+                select: "userName profileImage"
+            }
+        ]);
 
         res.status(200).json(loop);
     }
@@ -76,9 +107,14 @@ export const like = async (req, res) => {
 export const comment = async (req, res) => {
     try {
         const { text } = req.body;
-        const loopId = req.params.postId;
 
-        const loop = await Post.findById(loopId);
+        if (!text) {
+            return res.status(400).json({ message: "did not allow empty comment" });
+        }
+
+        const loopId = req.params.loopId;
+
+        const loop = await Loop.findById(loopId);
 
         if (!loop) {
             return res.status(400).json({ message: "loop not found!" });
@@ -89,10 +125,21 @@ export const comment = async (req, res) => {
             text
         });
 
+        loop.comments.sort((a, b) => b._id.getTimestamp() - a._id.getTimestamp());
+
         await loop.save();
-        await loop.populate("author", "name userName, profileImage");
-        await loop.populate("comments.author");
-        res.status(200).json(post);
+        await loop.populate([
+            {
+                path: "author",
+                select: "userName profileImage"
+            },
+            {
+                path: "comments.author",
+                select: "userName profileImage"
+            }
+        ]);
+
+        res.status(200).json(loop);
     }
     catch (error) {
         console.log("Error in loop comment controller : ", error.message);
