@@ -10,8 +10,8 @@ export default function OtherUser({ user }) {
     return (
         <div className='w-full h-[80px] flex items-center justify-between border-b border-gray-800'>
             <div className='flex items-center gap-[10px] cursor-pointer' onClick={() => navigate(`profile/${user.userName}`)}>
-                <div className='w-12 h-12 border-2 border-blue-400 rounded-full overflow-hidden'>
-                    <img src={user?.profileImage || maleDP} alt="" className='w-full object-cover object-center' />
+                <div className='w-12 h-12 border-2 border-blue-400 rounded-full overflow-hidden shrink-0'>
+                    <img src={user?.profileImage || maleDP} alt="" className='h-full w-full object-cover object-center' />
                 </div>
                 <div>
                     <div className='text-[18px] text-white font-semibold'>{user.name}</div>

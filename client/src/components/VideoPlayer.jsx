@@ -9,25 +9,40 @@ export default function VideoPlayer({ media }) {
 
 
     useEffect(() => {
+        // 1. Create a local variable for the ref to use in the cleanup function
+        const currentVideo = videoTag.current;
+
         const observer = new IntersectionObserver(([entry]) => {
             const video = videoTag.current;
+
+            // Safety Check: Ensure the video element actually exists
+            if (!video) return;
+
             if (entry.isIntersecting) {
-                video.play();
-            }
-            else {
-                video.pause();
+                // Play returns a promise; we MUST catch errors like 'AbortError'
+                video.play().catch((err) => {
+                    if (err.name !== "AbortError") {
+                        console.error("Playback failed:", err);
+                    }
+                });
+            } else {
+                // Use optional chaining for extra safety
+                video?.pause();
             }
         }, { threshold: 0.6 });
 
-        if (videoTag.current) {
-
-            observer.observe(videoTag.current);
+        if (currentVideo) {
+            observer.observe(currentVideo);
         }
 
         return () => {
-            if (videoTag.current) observer.unobserve(videoTag.current);
-        }
-    }, [])
+            // Use the local variable to disconnect properly
+            if (currentVideo) {
+                observer.unobserve(currentVideo);
+            }
+            observer.disconnect(); // Fully stop the observer
+        };
+    }, []);
 
     const handleVideoClick = () => {
         if (isPlaying) {

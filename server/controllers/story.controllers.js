@@ -40,6 +40,7 @@ export const uploadStory = async (req, res) => {
 export const viewStory = async (req, res) => {
     try {
         const storyId = req.params.storyId;
+        console.log(storyId);
         const story = await Story.findById(storyId);
 
         if (!story) {
@@ -67,20 +68,46 @@ export const viewStory = async (req, res) => {
 export const getStoryByUserName = async (req, res) => {
     try {
         const userName = req.params.userName;
+
         const user = await User.findOne({ userName });
 
         if (!user) {
             return res.status(400).json({ message: "User not found!" });
         }
 
-        const story = await Story.find({
+        const story = await Story.findOne({
             author: user._id
-        }).populate("viewers author");
+        });
+
+        await story.populate([
+            { path: "author", select: "userName profileImage" },
+            { path: "viewers", select: "userName profileImage" }
+        ]);
+
 
         return res.status(200).json(story);
     }
     catch (error) {
         console.log("Error in get story by userName controller : ", error.message);
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export const getAllStory = async (req, res) => {
+    try {
+        const currUser = await User.findById(req.userId);
+        const followingIds = currUser.following;
+
+        const stories = await Story.find({
+            author: { $in: followingIds }
+        })
+            .populate("viewers author")
+            .sort({ createdAt: -1 });
+
+        res.status(200).json(stories);
+    }
+    catch (error) {
+        console.log("Error in get all story controller : ", error.message);
         res.status(500).json({ message: error.message });
     }
 }

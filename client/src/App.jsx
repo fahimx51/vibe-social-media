@@ -13,6 +13,8 @@ import Upload from './pages/Upload'
 import GetAllPost from './hooks/GetAllPost'
 import Loops from './pages/Loops'
 import GetAllLoops from './hooks/GetAllLoops'
+import Story from './pages/Story'
+import GetAllStory from './hooks/GetAllStory'
 
 export const serverUrl = "http://localhost:8000"
 
@@ -22,13 +24,14 @@ export default function App() {
   GetSuggestedUser();
   GetAllPost();
   GetAllLoops();
-  
+  GetAllStory();
+
 
   const { userData, isCheckingAuth } = useSelector(state => state.user);
 
 
   if (isCheckingAuth) {
-    return <div className="h-screen flex items-center justify-center bg-black text-white">Loading Vibe...</div>;
+    return <div className="h-screen flex items-center justify-center bg-gray-900 text-white">Loading Vibe...</div>;
   }
 
   return (
@@ -45,6 +48,8 @@ export default function App() {
       <Route path='*' element={<Navigate to="/" />} />
 
       <Route path='/profile/:userName' element={userData ? <Profile /> : <Navigate to="/signIn" />} />
+
+      <Route path='/story/:userName' element={userData ? <Story /> : <Navigate to="/signIn" />} />
 
       <Route path='/upload' element={userData ? <Upload /> : <Navigate to="/signIn" />} />
 

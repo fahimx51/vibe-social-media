@@ -35,7 +35,7 @@ export default function LeftHome() {
 
             <div className='flex items-center justify-between gap-2.5 w-full border-b-2 border-b-gray-900 py-3.5'>
                 <div className='flex items-center gap-[10px]'>
-                    <div className='w-12 h-12 border-2 border-blue-400 rounded-full cursor-pointer overflow-hidden'>
+                    <div className='w-12 h-12 border-2 border-blue-400 rounded-full cursor-pointer overflow-hidden shrink-0'>
                         <img src={userData?.profileImage || maleDP} alt="" className='w-full h-full object-cover object-center' />
                     </div>
                     <div>

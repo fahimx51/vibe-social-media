@@ -29,7 +29,8 @@ export const getCurrentUser = async (req, res) => {
                         select: "userName profileImage"
                     }
                 ]
-            });
+            })
+            .populate("story")
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
@@ -47,7 +48,8 @@ export const suggestedUsers = async (req, res) => {
     try {
         const users = await User.find({ _id: { $ne: req.userId } })
             .select("-password")
-            .limit(5);
+            .limit(5)
+            .sort({ createdAt: -1 });
 
         res.status(200).json(users);
     }

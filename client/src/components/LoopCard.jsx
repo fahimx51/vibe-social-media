@@ -29,25 +29,40 @@ export default function LoopCard({ loop }) {
 
 
     useEffect(() => {
+        // 1. Create a local variable for the ref to use in the cleanup function
+        const currentVideo = videoRef.current;
+
         const observer = new IntersectionObserver(([entry]) => {
             const video = videoRef.current;
+
+            // Safety Check: Ensure the video element actually exists
+            if (!video) return;
+
             if (entry.isIntersecting) {
-                video.play();
-            }
-            else {
-                video.pause();
+                // Play returns a promise; we MUST catch errors like 'AbortError'
+                video.play().catch((err) => {
+                    if (err.name !== "AbortError") {
+                        console.error("Playback failed:", err);
+                    }
+                });
+            } else {
+                // Use optional chaining for extra safety
+                video?.pause();
             }
         }, { threshold: 0.6 });
 
-        if (videoRef.current) {
-
-            observer.observe(videoRef.current);
+        if (currentVideo) {
+            observer.observe(currentVideo);
         }
 
         return () => {
-            if (videoRef.current) observer.unobserve(videoRef.current);
-        }
-    }, [])
+            // Use the local variable to disconnect properly
+            if (currentVideo) {
+                observer.unobserve(currentVideo);
+            }
+            observer.disconnect(); // Fully stop the observer
+        };
+    }, []);
 
 
     useEffect(() => {
@@ -164,7 +179,7 @@ export default function LoopCard({ loop }) {
 
                 <div className='w-full h-[80px] fixed bottom-1 flex items-center justify-between px-[20px] py-[20px]'>
                     <div className='w-10 h-10 border-2 border-blue-400 rounded-full cursor-pointer overflow-hidden'>
-                        <img src={loop?.author?.profileImage || maleDP} alt="" className='w-full h-full object-cover object-center' />
+                        <img src={userData?.profileImage || maleDP} alt="" className='w-full h-full object-cover object-center' />
                     </div>
                     <input onChange={(e) => setComment(e.target.value)} value={comment} type="text" placeholder='Write a comment...' className='px-[10px] text-white border-b border-b-gray-400 w-[90%] outline-none h-[40px] ' />
                     <button onClick={handleComment} className='absolute right-[20px] cursor-pointer'> <FiSend className='h-[25px] w-[25px] text-white' /> </button>

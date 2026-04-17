@@ -54,7 +54,7 @@ export const uploadLoop = async (req, res) => {
                 path: "comments.author",
                 select: "userName profileImage"
             }
-        ]).sort({ createdAt: -1 });
+        ]);
 
         res.status(201).json(populatedLoop);
     }
