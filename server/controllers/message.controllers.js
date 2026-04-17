@@ -49,10 +49,35 @@ export const sendMessage = async (req, res) => {
 
 export const getAllMessages = async (req, res) => {
     try {
-        
+        const senderId = req.userId;
+        const receiverId = req.params.receiverId;
+
+        const conversation = await Conversation.findOne({
+            participants: {
+                $all: [
+                    senderId, receiverId
+                ]
+            }
+        }).populate("messages");
+
+        res.status(200).json(conversation);
     }
     catch (error) {
         res.status(500).json({ message: error.message });
         console.log("Error in get all message controller", error.message);
+    }
+}
+
+export const getPrevUserChats = async (req, res) => {
+    try {
+        const conversation = await Conversation.find({
+            participants: req.userId,
+        }).populate("participants").sort({ updatedAt: -1 });
+
+        res.status(200).json(conversation);
+    }
+    catch (error) {
+        res.status(500).json({ message: error.message });
+        console.log("Error in get previous chats controller", error.message);
     }
 }
