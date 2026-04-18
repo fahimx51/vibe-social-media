@@ -9,6 +9,7 @@ import maleDP from '../assets/dp.jpeg'
 import Navbar from '../components/Navbar';
 import FollowButton from '../components/FollowButton';
 import Post from '../components/Post';
+import { setSelectedUser } from '../redux/messageSlice';
 
 
 export default function Profile() {
@@ -116,7 +117,16 @@ export default function Profile() {
 
                     <>
                         <FollowButton targetUserId={profileData?._id} tailwind={'px-[10px] min-w-[150px] py-[5px] h-[40px] bg-white cursor-pointer rounded-2xl '} />
-                        <button className='px-[10px] min-w-[150px] py-[5px] h-[40px] bg-white cursor-pointer rounded-2xl '>Message</button>
+                        <button
+                            onClick={
+                                () => {
+                                    dispatch(setSelectedUser(profileData))
+                                    navigate(`/message-area`)
+                                }
+                            }
+                            className='px-[10px] min-w-[150px] py-[5px] h-[40px] bg-white cursor-pointer rounded-2xl '>
+                            Message
+                        </button>
                     </>
                 }
             </div>

@@ -15,6 +15,8 @@ import Loops from './pages/Loops'
 import GetAllLoops from './hooks/GetAllLoops'
 import Story from './pages/Story'
 import GetAllStory from './hooks/GetAllStory'
+import Messages from './pages/Messages'
+import MessageArea from './pages/MessageArea'
 
 export const serverUrl = "http://localhost:8000"
 
@@ -56,6 +58,10 @@ export default function App() {
       <Route path='/edit-profile' element={userData ? <EditProfile /> : <Navigate to="/signIn" />} />
 
       <Route path='/loops' element={userData ? <Loops /> : <Navigate to="/signIn" />} />
+
+      <Route path='/messages' element={userData ? <Messages /> : <Navigate to="/signIn" />} />
+
+      <Route path='/message-area' element={userData ? <MessageArea /> : <Navigate to="/signIn" />} />
 
     </Routes>
   )

@@ -31,6 +31,7 @@ app.use("/api/user", userRouter);
 app.use("/api/posts", postRouter);
 app.use("/api/loops", loopRouter);
 app.use("/api/story", storyRouter);
+app.use("/api/message", storyRouter);
 
 app.listen(port, async () => {
     await connectDB();

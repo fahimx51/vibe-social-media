@@ -1,10 +1,12 @@
 import React from 'react'
 import logo_white from '../assets/logo_white.png'
 import { FaRegHeart } from 'react-icons/fa'
+import { AiOutlineMessage } from "react-icons/ai";
 import Navbar from './Navbar'
 import { useSelector } from 'react-redux'
 import Post from './Post'
 import StoryDp from './StoryDp'
+import { useNavigate } from 'react-router-dom';
 
 export default function Feed() {
 
@@ -13,14 +15,15 @@ export default function Feed() {
 
     const { storyList } = useSelector(state => state.story);
 
-    console.log(storyList);
+    const navigate = useNavigate();
 
     return (
         <div className='lg:w-[50%] w-full bg-gray-950 min-h-screen lg:h-screen relative lg:overflow-y-auto px-5 pt-5 no-scrollbar'>
             <div className='w-full h-[100px] flex items-center justify-between lg:hidden'>
                 <img src={logo_white} alt="" className='w-20' />
-                <div>
+                <div className='flex items-center gap-[20px]'>
                     <FaRegHeart className='w-[25px] h-[25px] text-white cursor-pointer' />
+                    <AiOutlineMessage onClick={()=> navigate('/messages')} className='w-[25px] h-[25px] text-white cursor-pointer' />
                 </div>
             </div>
 
