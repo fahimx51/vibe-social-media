@@ -8,6 +8,7 @@ import userRouter from './routes/user.routes.js';
 import postRouter from './routes/post.routes.js';
 import loopRouter from './routes/loop.routes.js';
 import storyRouter from './routes/story.routes.js';
+import messageRouter from './routes/message.routes.js';
 
 dotenv.config();
 const app = express();
@@ -31,7 +32,7 @@ app.use("/api/user", userRouter);
 app.use("/api/posts", postRouter);
 app.use("/api/loops", loopRouter);
 app.use("/api/story", storyRouter);
-app.use("/api/message", storyRouter);
+app.use("/api/message", messageRouter);
 
 app.listen(port, async () => {
     await connectDB();

@@ -1,19 +1,88 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { IoArrowBack } from "react-icons/io5";
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom';
 import maleDP from '../assets/dp.jpeg'
 import { IoImageOutline } from "react-icons/io5";
 import { IoIosSend } from "react-icons/io";
+import axios from 'axios';
+import { serverUrl } from '../App';
+import { setMessages } from '../redux/messageSlice';
+import SenderMessage from '../components/SenderMessage';
+import ReceiverMessage from '../components/ReceiverMessage';
 
 export default function MessageArea() {
 
     const navigate = useNavigate();
-    const { selectedUser } = useSelector(state => state.message);
+
+    const { selectedUser, messages } = useSelector(state => state.message);
+    const { userData } = useSelector(state => state.user);
+
+    const [input, setInput] = useState("");
+    const [frontendImage, setFrontendImage] = useState(null);
+    const [backendImage, setBackendImage] = useState(null);
+    const imageInputRef = useRef();
+    const dispatch = useDispatch();
+
+    const scrollRef = useRef();
+
+    const getAllMessages = async () => {
+        try {
+            const result = await axios.get(`${serverUrl}/api/message/getAllMessages/${selectedUser._id}`, { withCredentials: true });
+            console.log(result.data.messages);
+            dispatch(setMessages(result.data.messages));
+        }
+        catch (error) {
+            console.log("Get all messages error", error);
+            dispatch(setMessages([]));
+        }
+    };
+
+    useEffect(() => {
+        // This will run every time the messages array updates
+        scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]); // Dependency array is key!
+
+    useEffect(() => {
+        getAllMessages();
+    }, [])
+
+
+    const handleImage = (e) => {
+        const file = e.target.files[0];
+        setBackendImage(file);
+        setFrontendImage(URL.createObjectURL(file));
+    }
+
+    const handleSendMessage = async (e) => {
+        e.preventDefault();
+
+        try {
+            const formData = new FormData();
+            formData.append("text", input);
+
+            if (backendImage) {
+                formData.append("image", backendImage);
+            }
+
+            const result = await axios.post(`${serverUrl}/api/message/send/${selectedUser._id}`, formData, { withCredentials: true });
+            console.log(result.data);
+
+            dispatch(setMessages([...messages, result.data]));
+
+            setInput("");
+            setBackendImage(null);
+            setFrontendImage(null);
+        }
+        catch (error) {
+            console.log("HandleSendMessage error", error);
+        }
+    }
+
 
     return (
         <div className='w-full h-screen bg-gray-900 relative'>
-            <div className='flex items-center gap-[15px] px-[10px] py-[10px] fixed top-0 z-100 w-full '>
+            <div className='flex h-18 items-center gap-[15px] px-[10px] py-[10px] fixed top-0 z-100 w-full bg-gray-900/40'>
                 <div className=' h-[80px] flex items-center gap-[20px] px-[20px]'>
                     <IoArrowBack onClick={() => navigate(`/`)} className='text-white cursor-pointer w-8 h-8' />
                 </div>
@@ -27,18 +96,48 @@ export default function MessageArea() {
                 </div>
             </div>
 
+            <div className='w-full h-[92%] pt-[100px] pb-[120px] lg:pb-[150px] px-[40px] flex flex-col gap-[20px] overflow-auto bg-gray-900'>
+                {
+                    messages.length > 0 ? messages.map((msg, index) =>
+                        msg.sender == userData._id ?
+                            <SenderMessage key={index} msg={msg} />
+                            :
+                            <ReceiverMessage key={index} msg={msg} />
+                    )
+                        :
+                        <div className='text-gray-600 font-black text-3xl w-full h-screen flex items-center justify-center'>
+                            No Messages
+                        </div>
+                }
+                <div ref={scrollRef} />
+            </div>
+
             <div className='w-full h-[80px] fixed bottom-0 flex justify-center items-center bg-gray-900 z-100'>
-                <form className='w-[90%] max-w-[800px] h-[80%] rounded-full bg-gray-950 flex items-center gap-[10px] px-[20px] relative'>
+                <form onSubmit={handleSendMessage} className='w-[90%] max-w-[800px] h-[80%] rounded-full bg-gray-950 flex items-center gap-[10px] px-[20px] relative'>
+                    {
+                        frontendImage &&
+                        <div className='w-[100px] rounded-2xl h-[100px] absolute top-[-120px] right-[10px] overflow-hidden'>
+                            <img src={frontendImage} alt="" className='h-full object-cover' />
+                        </div>
+                    }
+
+                    <input onChange={handleImage} type="file" accept='image/*' ref={imageInputRef} className='hidden' />
                     <input
+                        onChange={(e) => setInput(e.target.value)}
+                        value={input}
                         type="text"
                         placeholder='Write a message...'
                         className='w-full h-full px-[20px] text-[18px] text-white outline-0'
-                        required
                     />
 
                     <div className='flex items-center gap-[20px]'>
-                        <IoImageOutline className='w-[28px] h-[28px] text-white' />
-                        <button className='bg-gradient-to-br from-[#b80099] to-[#1f01cc] h-10 w-10 cursor-pointer flex items-center justify-center rounded-full'><IoIosSend className='w-6 h-6 text-white' /></button>
+                        <IoImageOutline onClick={() => imageInputRef.current.click()} className='w-[28px] h-[28px] text-white' />
+                        <button
+                            disabled={!input.trim() && !frontendImage}
+                            className={`${!input.trim() && !frontendImage ? 'opacity-20 cursor-not-allowed' : 'cursor-pointer'} bg-gradient-to-br from-[#b80099] to-[#1f01cc] h-10 w-10 flex items-center justify-center rounded-full`}
+                        >
+                            <IoIosSend className='w-6 h-6 text-white' />
+                        </button>
                     </div>
                 </form>
             </div>

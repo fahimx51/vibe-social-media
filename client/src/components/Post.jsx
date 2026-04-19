@@ -69,8 +69,8 @@ export default function Post({ post }) {
     return (
         <div className='w-[90%] min-h-[450px] flex flex-col gap-[10px] bg-white items-center shadow-2xl shadow-[#00000058] rounded-2xl'>
             <div className='w-full h-[80px] flex justify-between items-center px-[10px]'>
-                <div className='flex justify-center items-center gap-[15px] md:gap-[20px]'>
-                    <div className='w-11 h-11 md:w-15 md:h-15 border-2 border-blue-400 rounded-full cursor-pointer overflow-hidden' onClick={() => navigate(`/profile/${userData.userName}`)}>
+                <div onClick={() => navigate(`/profile/${post?.author.userName}`)} className='cursor-pointer flex justify-center items-center gap-[15px] md:gap-[20px]'>
+                    <div className='w-11 h-11 md:w-15 md:h-15 border-2 border-blue-400 rounded-full overflow-hidden'>
                         <img src={post?.author?.profileImage || maleDP} alt="" className='w-full h-full object-cover object-center' />
                     </div>
                     <div className='w-[200px] font-semibold truncate'>
@@ -79,7 +79,7 @@ export default function Post({ post }) {
                 </div>
                 {
                     userData?._id != post.author._id &&
-                    <FollowButton targetUserId={post.author._id} tailwind={'px-[10px] w-[80px] md:w-[100px] py-[5px] h-[30px] md:h-[40px] bg-gray-950 text-white rounded-2xl text-[14px] md:text-[16px]'} />
+                    <FollowButton targetUserId={post.author._id} tailwind={'px-[10px] min-w-[60px] md:min-w-[80px] py-[5px] h-[30px] md:h-[40px] bg-gray-950 text-white rounded-2xl text-[14px] md:text-[16px]'} />
 
                 }
             </div>
