@@ -4,7 +4,7 @@ import SignUp from './pages/SignUp'
 import SignIn from './pages/SignIn'
 import ForgotPassword from './pages/ForgotPassword'
 import Home from './pages/Home'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import GetCurrentUser from './hooks/GetCurrentUser'
 import GetSuggestedUser from './hooks/GetSuggestedUser'
 import Profile from './pages/Profile'
@@ -17,10 +17,36 @@ import Story from './pages/Story'
 import GetAllStory from './hooks/GetAllStory'
 import Messages from './pages/Messages'
 import MessageArea from './pages/MessageArea'
+import { useEffect } from 'react'
+import { io } from 'socket.io-client'
+import { setSocket } from './redux/socketSlice'
 
 export const serverUrl = "http://localhost:8000"
 
 export default function App() {
+
+  const { userData, isCheckingAuth } = useSelector(state => state.user);
+  const { socket } = useSelector(state => state.socket);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (userData) {
+      const socketIo = io(serverUrl, {
+        query: {
+          userId: userData?._id
+        }
+      });
+
+      dispatch(setSocket(socketIo));
+      return () => socket.close();
+    }
+    else {
+      if (socket) {
+        socket.close();
+        dispatch(setSocket(null));
+      }
+    }
+  }, [userData])
 
   GetCurrentUser();
   GetSuggestedUser();
@@ -29,7 +55,7 @@ export default function App() {
   GetAllStory();
 
 
-  const { userData, isCheckingAuth } = useSelector(state => state.user);
+
 
 
   if (isCheckingAuth) {
