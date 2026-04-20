@@ -17,6 +17,7 @@ export default function MessageArea() {
 
     const { selectedUser, messages } = useSelector(state => state.message);
     const { userData } = useSelector(state => state.user);
+    const { socket } = useSelector(state => state.socket);
 
     const [input, setInput] = useState("");
     const [frontendImage, setFrontendImage] = useState(null);
@@ -45,7 +46,15 @@ export default function MessageArea() {
 
     useEffect(() => {
         getAllMessages();
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        socket?.on("newMessage", (msg) => {
+            dispatch(setMessages([...messages, msg]));
+        });
+
+        return () => socket?.off("newMessage");
+    }, [messages, setMessages])
 
 
     const handleImage = (e) => {

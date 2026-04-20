@@ -12,16 +12,19 @@ import { setPostData } from '../redux/postSlice';
 import { useNavigate } from 'react-router-dom';
 import { setUserData } from '../redux/userSlice';
 import FollowButton from './FollowButton';
+import { useEffect } from 'react';
 
 export default function Post({ post }) {
 
     const { userData } = useSelector(state => state.user);
+    const { socket } = useSelector(state => state.socket);
+    const { postData } = useSelector(state => state.post);
+
     const navigate = useNavigate();
 
     const [showComment, setShowComment] = useState(false);
     const [comment, setComment] = useState("");
     const dispatch = useDispatch();
-    const { postData } = useSelector(state => state.post);
 
     const handleLike = async () => {
         try {
@@ -64,6 +67,24 @@ export default function Post({ post }) {
             console.log("error in save handler", error);
         }
     }
+
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleLikedPost = (data) => {
+            const updatedPosts = postData.map(p =>
+                p._id === data.postId ? { ...p, likes: data.likes } : p
+            );
+
+            dispatch(setPostData(updatedPosts));
+        };
+
+        socket.on("likedPost", handleLikedPost);
+
+        return () => {
+            socket.off("likedPost", handleLikedPost);
+        };
+    }, [postData, socket, dispatch]); 
 
 
     return (

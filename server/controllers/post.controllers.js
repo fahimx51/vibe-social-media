@@ -1,6 +1,7 @@
 import uploadOnCloudinary from '../config/cloudinary.js';
 import Post from '../models/post.model.js';
 import User from '../models/user.model.js';
+import { io } from '../socket.js';
 export const uploadPost = async (req, res) => {
     try {
         const { caption, mediaType } = req.body;
@@ -67,6 +68,11 @@ export const like = async (req, res) => {
 
         await post.populate("author comments.author");
 
+        io.emit("likedPost", {
+            postId: post._id,
+            likes: post.likes
+        });
+
 
         res.status(200).json(post);
     }
@@ -94,6 +100,12 @@ export const comment = async (req, res) => {
         await post.save();
         await post.populate("author", "name userName, profileImage");
         await post.populate("comments.author");
+
+        io.emit("commentPost", {
+            postId: post._id,
+            comments: post.comments
+        });
+
         res.status(200).json(post);
     }
     catch (error) {
