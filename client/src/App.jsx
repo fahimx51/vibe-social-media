@@ -19,7 +19,8 @@ import Messages from './pages/Messages'
 import MessageArea from './pages/MessageArea'
 import { useEffect } from 'react'
 import { io } from 'socket.io-client'
-import { setSocket } from './redux/socketSlice'
+import { setOnlineUsers, setSocket } from './redux/socketSlice'
+import GetPrevChatUsers from './hooks/GetPrevChatUsers'
 
 export const serverUrl = "http://localhost:8000"
 
@@ -31,6 +32,7 @@ export default function App() {
 
   useEffect(() => {
     if (userData) {
+
       const socketIo = io(serverUrl, {
         query: {
           userId: userData?._id
@@ -38,11 +40,16 @@ export default function App() {
       });
 
       dispatch(setSocket(socketIo));
+
+      socketIo.on('getOnlineUsers', (users) => {
+        dispatch(setOnlineUsers(users));
+      })
+
       return () => socket.close();
     }
     else {
       if (socket) {
-        socket.close();
+        socket?.close();
         dispatch(setSocket(null));
       }
     }
@@ -53,9 +60,7 @@ export default function App() {
   GetAllPost();
   GetAllLoops();
   GetAllStory();
-
-
-
+  GetPrevChatUsers();
 
 
   if (isCheckingAuth) {

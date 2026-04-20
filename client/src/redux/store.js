@@ -14,7 +14,11 @@ const store = configureStore({
         loop: loopSlice,
         message: messageSlice,
         socket: socketSlice
-    }
+    },
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: false, // This disables the warning completely
+        }),
 });
 
 export default store;

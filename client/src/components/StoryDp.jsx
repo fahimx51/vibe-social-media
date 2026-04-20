@@ -14,8 +14,7 @@ export default function StoryDp({ userName, profileImage, story }) {
 
     const handleViewer = async () => {
         try {
-            const result = await axios(`${serverUrl}/api/story/view/${story._id}`, { withCredentials: true });
-            console.log("Done");
+            await axios(`${serverUrl}/api/story/view/${story._id}`, { withCredentials: true });
         }
         catch (error) {
             console.log("error in story viewer handler", error);
