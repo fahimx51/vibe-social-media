@@ -5,6 +5,7 @@ import storySlice from './storySlice'
 import loopSlice from './loopSlice'
 import messageSlice from './messageSlice'
 import socketSlice from './socketSlice'
+import notificationSlice from './notificationSlice'
 
 const store = configureStore({
     reducer: {
@@ -13,7 +14,8 @@ const store = configureStore({
         story: storySlice,
         loop: loopSlice,
         message: messageSlice,
-        socket: socketSlice
+        socket: socketSlice,
+        notification: notificationSlice
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

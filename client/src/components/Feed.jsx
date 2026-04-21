@@ -12,6 +12,7 @@ export default function Feed() {
 
     const { postData } = useSelector(state => state.post);
     const { userData } = useSelector(state => state.user);
+    const { notificationData } = useSelector(state => state.notification);
 
     const { storyList } = useSelector(state => state.story);
 
@@ -22,8 +23,14 @@ export default function Feed() {
             <div className='w-full h-[100px] flex items-center justify-between lg:hidden'>
                 <img src={logo_white} alt="" className='w-20' />
                 <div className='flex items-center gap-[20px]'>
-                    <FaRegHeart className='w-[25px] h-[25px] text-white cursor-pointer' />
-                    <AiOutlineMessage onClick={()=> navigate('/messages')} className='w-[25px] h-[25px] text-white cursor-pointer' />
+                    <div className='relative'>
+                        <FaRegHeart className='w-[30px] h-[30px] text-white cursor-pointer' />
+                        {
+                            notificationData?.length > 0 && notificationData.some((notification) => notification.isRead == false) && <div className='h-3 w-3 border-1 bg-blue-600 rounded-full absolute top-[0px] right-[0px]'></div>
+                        }
+
+                    </div>
+                    <AiOutlineMessage onClick={() => navigate('/messages')} className='w-[30px] h-[30px] text-white cursor-pointer' />
                 </div>
             </div>
 

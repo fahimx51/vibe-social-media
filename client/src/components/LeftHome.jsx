@@ -7,12 +7,14 @@ import axios from 'axios'
 import { serverUrl } from '../App';
 import { setUserData } from '../redux/userSlice'
 import OtherUser from './OtherUser'
+import { useNavigate } from 'react-router-dom'
 
 export default function LeftHome() {
 
     const { userData, suggestedUsers } = useSelector(state => state.user);
+    const { notificationData } = useSelector(state => state.notification);
     const dispatch = useDispatch();
-
+    const navigate = useNavigate();
 
     const handleLogout = async () => {
         try {
@@ -28,8 +30,12 @@ export default function LeftHome() {
         <div className='w-[25%] hidden lg:block min-h-screen bg-gray-950 border-r-2 border-gray-900 px-5'>
             <div className='w-full h-[100px] flex items-center justify-between'>
                 <img src={logo_white} alt="" className='w-20' />
-                <div>
-                    <FaRegHeart className='w-[25px] h-[25px] text-white cursor-pointer' />
+                <div onClick={() => navigate('/notification')} className='relative  cursor-pointer'>
+                    <FaRegHeart className='w-[30px] h-[30px] text-white' />
+                    {
+                        notificationData?.length > 0 && notificationData.some((notification) => notification.isRead == false) && <div className='h-3 w-3 border-1 bg-blue-600 rounded-full absolute top-[0px] right-[0px]'></div>
+                    }
+
                 </div>
             </div>
 

@@ -162,6 +162,24 @@ export const follow = async (req, res) => {
             currUser.following.push(targetUserId);
             targetUser.followers.push(currUserId);
 
+            if (targetUser._id != req.userId) {
+                const notification = await Notification.create({
+                    sender: req.userId,
+                    receiver: targetUser._id,
+                    type: 'follow',
+                    message: "started to following you"
+                });
+
+                const populatedNotification = await Notification.findById(notification._id)
+                    .populate("sender receiver");
+
+                const receiverSocketId = getSocketId(targetUser._id);
+
+                if (receiverSocketId) {
+                    io.to(receiverSocketId).emit("newNotification", populatedNotification);
+                }
+            }
+
             await currUser.populate("followers following posts loops savedPosts")
             await targetUser.populate("followers following posts loops savedPosts")
 
@@ -178,5 +196,29 @@ export const follow = async (req, res) => {
     catch (error) {
         console.log("follow controller error :", error.message);
         res.status(500).json({ message: `error in follow controller : ${error.message}` });
+    }
+}
+
+export const search = async (req, res) => {
+    try {
+        const keyword = req.query.keyword;
+
+        if (!keyword) {
+            return res.status(200).json([]); // Better to return empty array than 400 for search
+        }
+
+        // We use .find() to search, and .select() to pick specific fields
+        const users = await User.find({
+            $or: [
+                { userName: { $regex: keyword, $options: "i" } },
+                { name: { $regex: keyword, $options: "i" } }
+            ]
+        }).select("userName name profileImage"); // Only fetch what the sidebar/list needs
+
+        res.status(200).json(users);
+    }
+    catch (error) {
+        console.log("Error occur in search controller:", error.message);
+        res.status(500).json({ message: `Search user error: ${error.message}` });
     }
 }

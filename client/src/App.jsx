@@ -21,6 +21,9 @@ import { useEffect } from 'react'
 import { io } from 'socket.io-client'
 import { setOnlineUsers, setSocket } from './redux/socketSlice'
 import GetPrevChatUsers from './hooks/GetPrevChatUsers'
+import Search from './pages/Search'
+import GetAllNotification from './hooks/GetAllNotification'
+import Notification from './pages/Notification'
 
 export const serverUrl = "http://localhost:8000"
 
@@ -61,6 +64,7 @@ export default function App() {
   GetAllLoops();
   GetAllStory();
   GetPrevChatUsers();
+  GetAllNotification();
 
 
   if (isCheckingAuth) {
@@ -93,6 +97,8 @@ export default function App() {
       <Route path='/messages' element={userData ? <Messages /> : <Navigate to="/signIn" />} />
 
       <Route path='/message-area' element={userData ? <MessageArea /> : <Navigate to="/signIn" />} />
+      <Route path='/search' element={userData ? <Search /> : <Navigate to="/signIn" />} />
+      <Route path='/notification' element={userData ? <Notification /> : <Navigate to="/signIn" />} />
 
     </Routes>
   )

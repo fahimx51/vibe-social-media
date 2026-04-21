@@ -9,8 +9,6 @@ export default function MessageCard({ participant, msg }) {
     const navigate = useNavigate();
     const { onlineUsers } = useSelector(state => state.socket)
 
-    console.log(msg);
-
     return (
         <div
             onClick={() => {

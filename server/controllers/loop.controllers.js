@@ -80,6 +80,24 @@ export const like = async (req, res) => {
         }
         else {
             loop.likes.push(req.userId);
+            if (loop.author._id != req.userId) {
+                const notification = await Notification.create({
+                    sender: req.userId,
+                    receiver: post.author._id,
+                    type: 'like',
+                    loop: loop._id,
+                    message: "liked your loop"
+                });
+
+                const populatedNotification = await Notification.findById(notification._id)
+                    .populate("sender receiver loop");
+
+                const receiverSocketId = getSocketId(loop.author._id);
+
+                if (receiverSocketId) {
+                    io.to(receiverSocketId).emit("newNotification", populatedNotification);
+                }
+            }
         }
 
         loop.comments.sort((a, b) => b._id.getTimestamp() - a._id.getTimestamp());
@@ -124,6 +142,25 @@ export const comment = async (req, res) => {
             author: req.userId,
             text
         });
+
+        if (loop.author._id != req.userId) {
+            const notification = await Notification.create({
+                sender: req.userId,
+                receiver: post.author._id,
+                type: 'comment',
+                loop: loop._id,
+                message: "commented on your loop"
+            });
+
+            const populatedNotification = await Notification.findById(notification._id)
+                .populate("sender receiver loop");
+
+            const receiverSocketId = getSocketId(loop.author._id);
+
+            if (receiverSocketId) {
+                io.to(receiverSocketId).emit("newNotification", populatedNotification);
+            }
+        }
 
         loop.comments.sort((a, b) => b._id.getTimestamp() - a._id.getTimestamp());
 

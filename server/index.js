@@ -10,6 +10,7 @@ import loopRouter from './routes/loop.routes.js';
 import storyRouter from './routes/story.routes.js';
 import messageRouter from './routes/message.routes.js';
 import { app, server } from './socket.js';
+import notificationRouter from './routes/notification.routes.js';
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.use("/api/posts", postRouter);
 app.use("/api/loops", loopRouter);
 app.use("/api/story", storyRouter);
 app.use("/api/message", messageRouter);
+app.use("/api/notification", notificationRouter);
 
 server.listen(port, async () => {
     await connectDB();
