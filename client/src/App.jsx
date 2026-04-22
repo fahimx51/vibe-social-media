@@ -86,7 +86,16 @@ export default function App() {
 
 
   if (isCheckingAuth) {
-    return <div className="h-screen flex items-center justify-center bg-gray-900 text-white">Loading Vibe...</div>;
+    return <div className="h-screen flex flex-col items-center justify-center bg-gray-900 gap-4">
+      <div className="flex space-x-2">
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
+      </div>
+      <p className="text-gray-400 font-mono tracking-[0.2em] animate-pulse uppercase text-xs">
+        Loading Vibe...
+      </p>
+    </div>
   }
 
   return (
