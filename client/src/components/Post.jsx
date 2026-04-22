@@ -24,6 +24,9 @@ export default function Post({ post }) {
 
     const [showComment, setShowComment] = useState(false);
     const [comment, setComment] = useState("");
+
+    const [isExpanded, setIsExpanded] = useState(false);
+    const MAX_LENGTH = 100;
     const dispatch = useDispatch();
 
     const handleLike = async () => {
@@ -47,7 +50,7 @@ export default function Post({ post }) {
 
             const updatedPosts = postData.map(p => p?._id == post?._id ? updatedPost : p);
             dispatch(setPostData(updatedPosts));
-            
+
             setComment("");
         }
         catch (error) {
@@ -82,7 +85,7 @@ export default function Post({ post }) {
         return () => {
             socket.off("likedPost", handleLikedPost);
         };
-    }, [postData, socket, dispatch]); 
+    }, [postData, socket, dispatch]);
 
 
     return (
@@ -126,9 +129,21 @@ export default function Post({ post }) {
             {
                 post?.caption &&
                 <div className='w-full px-[20px] gap-[10px] flex justify-start items-center'>
-                    <div>
-                        {post?.caption.slice(0, 50)}...
-                        <button className='cursor-pointer text-blue-600 font-semibold' >Read More</button>
+                    {/* Read More Caption Implementation */}
+                    <div className='text-gray-900 text-sm md:text-base pr-[60px]'>
+                        <span>
+                            {post?.caption?.length > MAX_LENGTH && !isExpanded
+                                ? `${post.caption.substring(0, MAX_LENGTH)}... `
+                                : post?.caption}
+                        </span>
+                        {post?.caption?.length > MAX_LENGTH && (
+                            <button
+                                onClick={() => setIsExpanded(!isExpanded)}
+                                className='text-blue-600 font-bold cursor-pointer hover:underline'
+                            > 
+                                {isExpanded ? ' Show less' : ' Read more'}
+                            </button>
+                        )}
                     </div>
                 </div>
             }

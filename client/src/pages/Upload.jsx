@@ -54,7 +54,6 @@ export default function Upload() {
 
             dispatch(setPostData([...postData, result.data]));
 
-            console.log(result);
             navigate('/');
         }
         catch (error) {
@@ -74,7 +73,6 @@ export default function Upload() {
             const result = await axios.post(`${serverUrl}/api/story/upload`, formData, { withCredentials: true });
 
             dispatch(setStoryData([...storyData, result.data]))
-            console.log(result);
             navigate('/');
         }
         catch (error) {
@@ -97,7 +95,6 @@ export default function Upload() {
 
             dispatch(setLoopData([...loopData, result.data]));
 
-            console.log(result);
             navigate('/');
         }
         catch (error) {
