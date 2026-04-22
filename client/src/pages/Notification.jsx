@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { IoArrowBack } from "react-icons/io5"
 import { useNavigate } from 'react-router-dom'
 import NotificationCard from '../components/NotificationCard'
@@ -12,10 +12,10 @@ export default function Notification({ notificationData }) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const [notif] = useState(notificationData);
 
     useEffect(() => {
-        const readAllNotifaction = async () => {
+        // We create the function inside or outside
+        const readAllNotification = async () => {
             try {
                 const result = await axios.post(`${serverUrl}/api/notification/markAsRead`, {}, { withCredentials: true });
                 dispatch(setNotificationData(result.data));
@@ -24,7 +24,11 @@ export default function Notification({ notificationData }) {
                 console.log(error);
             }
         }
-        readAllNotifaction();
+
+        // CLEANUP FUNCTION: This runs when the user leaves the page
+        return () => {
+            readAllNotification();
+        };
     }, []);
 
     return (
@@ -40,8 +44,8 @@ export default function Notification({ notificationData }) {
 
             {/* Notification List */}
             <div className='w-full max-w-[700px] mx-auto flex flex-col mt-2'>
-                {notif && notif.length > 0 ? (
-                    notif.map((noti) => (
+                {notificationData && notificationData.length > 0 ? (
+                    notificationData.map((noti) => (
                         <NotificationCard key={noti?._id} noti={noti} />
                     ))
                 ) : (

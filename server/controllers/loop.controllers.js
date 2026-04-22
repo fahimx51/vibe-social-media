@@ -92,7 +92,7 @@ export const like = async (req, res) => {
                 });
 
                 const populatedNotification = await Notification.findById(notification._id)
-                    .populate("sender receiver loop");
+                    .populate("sender");
 
                 const receiverSocketId = getSocketId(loop.author._id);
 
@@ -155,7 +155,7 @@ export const comment = async (req, res) => {
             });
 
             const populatedNotification = await Notification.findById(notification._id)
-                .populate("sender receiver loop");
+                .populate("sender");
 
             const receiverSocketId = getSocketId(loop.author._id);
 
