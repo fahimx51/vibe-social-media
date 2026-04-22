@@ -8,6 +8,7 @@ import { ClipLoader } from "react-spinners"
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setUserData } from '../redux/userSlice';
+import toast from 'react-hot-toast';
 
 export default function SignUp() {
     const [inputClicked, setInputClicked] = useState({
@@ -48,6 +49,7 @@ export default function SignUp() {
             const result = await axios.post(`${serverUrl}/api/auth/signUp`, { name, userName, email, password }, { withCredentials: true });
             // console.log(result.data.user);
             dispatch(setUserData(result.data.user));
+            toast.success(`Success! Your profile is now live.`);
         }
         catch (error) {
             console.log('Internal error', error.response?.data?.message);

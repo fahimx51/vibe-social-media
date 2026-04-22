@@ -25,6 +25,7 @@ import Search from './pages/Search'
 import GetAllNotification from './hooks/GetAllNotification'
 import Notification from './pages/Notification'
 import { setNotificationData } from './redux/notificationSlice'
+import { Toaster } from 'react-hot-toast'
 
 export const serverUrl = "http://localhost:8000"
 
@@ -99,34 +100,65 @@ export default function App() {
   }
 
   return (
-    <Routes>
+    <>
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        toastOptions={{
+          style: {
+            background: '#f3f4f6', 
+            color: '#111827',      
+            border: '1px solid #e5e7eb', 
+            fontWeight: '500',
+            fontSize: '15px',
+            padding: '12px 24px',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', // Subtle shadow for depth
+          },
+          success: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#22c55e', // Tailwind green-500
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#ef4444', // Tailwind red-500
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
+      <Routes>
 
-      <Route path='/signIn' element={userData ? <Navigate to="/" /> : <SignIn />} />
+        <Route path='/signIn' element={userData ? <Navigate to="/" /> : <SignIn />} />
 
-      <Route path='/signUp' element={userData ? <Navigate to="/" /> : <SignUp />} />
+        <Route path='/signUp' element={userData ? <Navigate to="/" /> : <SignUp />} />
 
-      <Route path='/forgot-password' element={userData ? <Navigate to="/" /> : <ForgotPassword />} />
+        <Route path='/forgot-password' element={userData ? <Navigate to="/" /> : <ForgotPassword />} />
 
-      <Route path='/' element={userData ? <Home /> : <Navigate to="/signIn" />} />
+        <Route path='/' element={userData ? <Home /> : <Navigate to="/signIn" />} />
 
-      <Route path='*' element={<Navigate to="/" />} />
+        <Route path='*' element={<Navigate to="/" />} />
 
-      <Route path='/profile/:userName' element={userData ? <Profile /> : <Navigate to="/signIn" />} />
+        <Route path='/profile/:userName' element={userData ? <Profile /> : <Navigate to="/signIn" />} />
 
-      <Route path='/story/:userName' element={userData ? <Story /> : <Navigate to="/signIn" />} />
+        <Route path='/story/:userName' element={userData ? <Story /> : <Navigate to="/signIn" />} />
 
-      <Route path='/upload' element={userData ? <Upload /> : <Navigate to="/signIn" />} />
+        <Route path='/upload' element={userData ? <Upload /> : <Navigate to="/signIn" />} />
 
-      <Route path='/edit-profile' element={userData ? <EditProfile /> : <Navigate to="/signIn" />} />
+        <Route path='/edit-profile' element={userData ? <EditProfile /> : <Navigate to="/signIn" />} />
 
-      <Route path='/loops' element={userData ? <Loops /> : <Navigate to="/signIn" />} />
+        <Route path='/loops' element={userData ? <Loops /> : <Navigate to="/signIn" />} />
 
-      <Route path='/messages' element={userData ? <Messages /> : <Navigate to="/signIn" />} />
+        <Route path='/messages' element={userData ? <Messages /> : <Navigate to="/signIn" />} />
 
-      <Route path='/message-area' element={userData ? <MessageArea /> : <Navigate to="/signIn" />} />
-      <Route path='/search' element={userData ? <Search /> : <Navigate to="/signIn" />} />
-      <Route path='/notification' element={userData ? <Notification notificationData={notificationData} /> : <Navigate to="/signIn" />} />
+        <Route path='/message-area' element={userData ? <MessageArea /> : <Navigate to="/signIn" />} />
+        <Route path='/search' element={userData ? <Search /> : <Navigate to="/signIn" />} />
+        <Route path='/notification' element={userData ? <Notification notificationData={notificationData} /> : <Navigate to="/signIn" />} />
 
-    </Routes>
+      </Routes>
+    </>
   )
 }

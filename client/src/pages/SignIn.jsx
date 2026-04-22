@@ -8,6 +8,7 @@ import { ClipLoader } from "react-spinners"
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setUserData } from '../redux/userSlice';
+import toast from 'react-hot-toast';
 
 export default function SignIp() {
     const [inputClicked, setInputClicked] = useState({
@@ -44,6 +45,7 @@ export default function SignIp() {
             const result = await axios.post(`${serverUrl}/api/auth/signIn`, { userName, password }, { withCredentials: true });
             dispatch(setUserData(result.data.user));
             // console.log(result.data.user);
+            toast.success(`Welcome back, ${result.data.user.userName}!`);
         }
         catch (error) {
             console.log('Internal error :', error.response?.data?.message);
