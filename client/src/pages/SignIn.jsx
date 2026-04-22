@@ -43,7 +43,7 @@ export default function SignIp() {
         try {
             const result = await axios.post(`${serverUrl}/api/auth/signIn`, { userName, password }, { withCredentials: true });
             dispatch(setUserData(result.data.user));
-            console.log(result.data.user);
+            // console.log(result.data.user);
         }
         catch (error) {
             console.log('Internal error :', error.response?.data?.message);

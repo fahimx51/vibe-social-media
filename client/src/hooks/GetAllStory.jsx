@@ -8,13 +8,15 @@ export default function GetAllStory() {
 
     const dispatch = useDispatch();
     const { userData } = useSelector(state => state.user)
+    const { storyData } = useSelector(state => state.story)
 
     useEffect(() => {
+        if (!userData || (storyData && storyData.length > 0)) return;
         const fetchStories = async () => {
             try {
                 const result = await axios.get(`${serverUrl}/api/story/getAllStory`, { withCredentials: true });
                 dispatch(setStoryList(result.data));
-               
+
             }
             catch (error) {
                 console.log(error.message);
@@ -23,5 +25,5 @@ export default function GetAllStory() {
 
         fetchStories();
 
-    }, [dispatch, userData])
+    }, [userData, dispatch])
 }

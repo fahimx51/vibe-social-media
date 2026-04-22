@@ -30,7 +30,6 @@ export default function MessageArea() {
     const getAllMessages = async () => {
         try {
             const result = await axios.get(`${serverUrl}/api/message/getAllMessages/${selectedUser._id}`, { withCredentials: true });
-            console.log(result.data.messages);
             dispatch(setMessages(result.data.messages));
         }
         catch (error) {
