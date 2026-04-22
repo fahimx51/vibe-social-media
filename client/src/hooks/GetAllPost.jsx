@@ -14,7 +14,7 @@ export default function GetAllPost() {
             try {
                 const result = await axios.get(`${serverUrl}/api/posts/getAllPosts`, { withCredentials: true });
                 dispatch(setPostData(result.data));
-                console.log(result.data);
+                
             }
             catch (error) {
                 console.log(error.message);

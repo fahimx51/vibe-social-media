@@ -40,7 +40,7 @@ export const uploadStory = async (req, res) => {
 export const viewStory = async (req, res) => {
     try {
         const storyId = req.params.storyId;
-        console.log(storyId);
+        
         const story = await Story.findById(storyId);
 
         if (!story) {

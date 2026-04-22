@@ -13,7 +13,6 @@ export default function GetAllNotification() {
             try {
                 const result = await axios.get(`${serverUrl}/api/notification/getAllNotifications`, { withCredentials: true });
                 dispatch(setNotificationData(result.data));
-                console.log(result.data);
             }
             catch (error) {
                 console.log(error.message);

@@ -15,7 +15,6 @@ export default function GetAllLoops() {
             try {
                 const result = await axios.get(`${serverUrl}/api/loops/getAllLoops`, { withCredentials: true });
                 dispatch(setLoopData(result.data));
-                console.log(result.data);
             }
             catch (error) {
                 console.log(error.message);

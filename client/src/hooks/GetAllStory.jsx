@@ -14,7 +14,7 @@ export default function GetAllStory() {
             try {
                 const result = await axios.get(`${serverUrl}/api/story/getAllStory`, { withCredentials: true });
                 dispatch(setStoryList(result.data));
-                console.log(result.data);
+               
             }
             catch (error) {
                 console.log(error.message);

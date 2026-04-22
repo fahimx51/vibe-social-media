@@ -12,7 +12,6 @@ export default function FollowButton({ targetUserId, tailwind }) {
     const handleFollow = async () => {
         try {
             const result = await axios.post(`${serverUrl}/api/user/follow/${targetUserId}`, {}, { withCredentials: true });
-            console.log(result.data);
             dispatch(setUserData(result.data.user));
             dispatch(setProfileData(result.data.target));
         }
