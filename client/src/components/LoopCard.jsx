@@ -122,7 +122,7 @@ export default function LoopCard({ loop }) {
     };
 
     return (
-        <div className='w-full h-screen lg:w-[480px] flex items-center justify-center border-l-2 border-r-2 border-gray-800 relative overflow-hidden'>
+        <div className='w-full h-screen md:w-[480px] flex items-center justify-center border-l-2 border-r-2 border-gray-800 relative overflow-hidden'>
             {/* Heart Animation */}
             <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none'>
                 {showHeart && <GoHeartFill className='heart-animation h-[100px] w-[100px] text-red-400 drop-shadow-2xl' />}
@@ -155,7 +155,7 @@ export default function LoopCard({ loop }) {
             </div>
 
             {/* Video Element */}
-            <video onTimeUpdate={handleTimeUpdate} onClick={handleClick} ref={videoRef} onDoubleClick={handleLikeOnDoubleClick} autoPlay muted={isMute} loop src={loop?.media} className='w-full h-full object-cover' />
+            <video onTimeUpdate={handleTimeUpdate} onClick={handleClick} ref={videoRef} onDoubleClick={handleLikeOnDoubleClick} autoPlay muted={isMute} loop src={loop?.media} className='w-full object-cover' />
             
             {/* Mute/Unmute Toggle */}
             <div onClick={() => setIsMute(prev => !prev)} className='absolute top-[50px] right-[20px] z-10 cursor-pointer'>

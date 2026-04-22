@@ -11,7 +11,7 @@ export default function Loops() {
 
     return (
         <div className='w-screen h-screen bg-gray-900 overflow-hidden flex justify-center items-center'>
-            <div className='w-full h-[80px] flex items-center gap-[20px] px-[20px] fixed top-[15px] left-[15x]'>
+            <div className='w-full h-[80px] flex items-center gap-[20px] px-[20px] fixed top-[15px] left-[15x] z-1'>
                 <IoArrowBack onClick={() => navigate(`/`)} className='text-white cursor-pointer w-9 h-9' />
                 <h1 className='text-white text-[20px] font-semibold'>Loops</h1>
             </div>
