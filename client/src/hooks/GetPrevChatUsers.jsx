@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { serverUrl } from '../App';
 import { setPrevChatsUsers } from '../redux/messageSlice';
 
@@ -8,7 +8,6 @@ import { setPrevChatsUsers } from '../redux/messageSlice';
 export default function GetPrevChatUsers() {
 
     const dispatch = useDispatch();
-    const { messages } = useSelector(state => state.message)
 
     useEffect(() => {
         const fetchChats = async () => {
@@ -23,5 +22,5 @@ export default function GetPrevChatUsers() {
 
         fetchChats();
 
-    }, [messages, dispatch])
+    }, [])
 }

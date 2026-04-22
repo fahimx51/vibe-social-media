@@ -71,7 +71,7 @@ export const like = async (req, res) => {
                 });
 
                 const populatedNotification = await Notification.findById(notification._id)
-                    .populate("sender receiver post");
+                    .populate("sender");
 
                 const receiverSocketId = getSocketId(post.author._id);
 
@@ -126,7 +126,7 @@ export const comment = async (req, res) => {
             });
 
             const populatedNotification = await Notification.findById(notification._id)
-                .populate("sender receiver post");
+                .populate("sender");
 
             const receiverSocketId = getSocketId(post.author._id);
 

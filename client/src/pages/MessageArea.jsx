@@ -7,7 +7,7 @@ import { IoImageOutline } from "react-icons/io5";
 import { IoIosSend } from "react-icons/io";
 import axios from 'axios';
 import { serverUrl } from '../App';
-import { setMessages } from '../redux/messageSlice';
+import { setMessages, setPrevChatsUsers } from '../redux/messageSlice';
 import SenderMessage from '../components/SenderMessage';
 import ReceiverMessage from '../components/ReceiverMessage';
 
@@ -15,7 +15,7 @@ export default function MessageArea() {
 
     const navigate = useNavigate();
 
-    const { selectedUser, messages } = useSelector(state => state.message);
+    const { selectedUser, messages, prevChatUsers } = useSelector(state => state.message);
     const { userData } = useSelector(state => state.user);
     const { socket } = useSelector(state => state.socket);
 
@@ -40,21 +40,45 @@ export default function MessageArea() {
     };
 
     useEffect(() => {
-        // This will run every time the messages array updates
         scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]); // Dependency array is key!
+    }, [messages]);
 
     useEffect(() => {
         getAllMessages();
     }, []);
 
     useEffect(() => {
-        socket?.on("newMessage", (msg) => {
+        if (!socket) return;
+
+        socket.on("newMessage", (msg) => {
             dispatch(setMessages([...messages, msg]));
+
+            if (prevChatUsers) {
+                const updatedSidebar = prevChatUsers.map((chat) => {
+                    const otherParticipant = chat.participants.find(p => p._id !== userData._id);
+
+                    const isTargetChat = otherParticipant?._id === msg.receiver || otherParticipant?._id === msg.sender;
+
+                    if (isTargetChat) {
+                        return {
+                            ...chat,
+                            messages: [msg],
+                            updatedAt: msg.updatedAt
+                        };
+                    }
+                    return chat;
+                });
+
+                const sortedSidebar = [...updatedSidebar].sort((a, b) =>
+                    new Date(b.updatedAt) - new Date(a.updatedAt)
+                );
+
+                dispatch(setPrevChatsUsers(sortedSidebar));
+            }
         });
 
-        return () => socket?.off("newMessage");
-    }, [messages, setMessages])
+        return () => socket.off("newMessage");
+    }, [socket, messages, prevChatUsers, dispatch, userData._id]);
 
 
     const handleImage = (e) => {
@@ -75,9 +99,24 @@ export default function MessageArea() {
             }
 
             const result = await axios.post(`${serverUrl}/api/message/send/${selectedUser._id}`, formData, { withCredentials: true });
-            console.log(result.data);
 
             dispatch(setMessages([...messages, result.data]));
+
+            if (prevChatUsers) {
+                const updatedSidebar = prevChatUsers.map((chat) => {
+                    const isTargetChat = chat.participants.some(p => p._id === selectedUser._id);
+
+                    if (isTargetChat) {
+                        return {
+                            ...chat,
+                            messages: [result.data]
+                        };
+                    }
+                    return chat;
+                }).sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
+                dispatch(setPrevChatsUsers(updatedSidebar));
+            }
 
             setInput("");
             setBackendImage(null);

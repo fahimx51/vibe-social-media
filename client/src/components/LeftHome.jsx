@@ -13,6 +13,7 @@ export default function LeftHome() {
 
     const { userData, suggestedUsers } = useSelector(state => state.user);
     const { notificationData } = useSelector(state => state.notification);
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -25,6 +26,7 @@ export default function LeftHome() {
             console.log(error.message);
         }
     };
+
 
     return (
         <div className='w-[25%] hidden lg:block min-h-screen bg-gray-950 border-r-2 border-gray-900 px-5'>

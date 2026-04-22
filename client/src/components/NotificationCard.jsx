@@ -9,7 +9,7 @@ export default function NotificationCard({ noti }) {
     return (
         <div
             key={noti._id}
-            className={`w-full p-4 flex items-center gap-4 border-b border-gray-900 hover:bg-gray-900/40 transition-all cursor-pointer ${!noti.isRead ? 'bg-blue-500/5' : ''}`}
+            className={`w-full rounded-2xl my-0.5 p-4 flex items-center gap-4 border-b border-gray-900 hover:bg-gray-900/40 transition-all cursor-pointer ${!noti.isRead ? 'bg-blue-500/20' : ''}`}
         >
             {/* Sender Image */}
             <div className='relative'>
@@ -37,13 +37,7 @@ export default function NotificationCard({ noti }) {
                 </span>
             </div>
 
-            {/* Post Preview (Optional) */}
-            {(noti.type === 'like' || noti.type === 'comment') && noti.post && (
-                <div className='w-10 h-10 bg-gray-800 rounded-md overflow-hidden flex-shrink-0'>
-                    {/* You could show a thumbnail of the post here if your schema included postImg */}
-                    <div className='w-full h-full bg-gradient-to-br from-blue-600 to-purple-600 opacity-30'></div>
-                </div>
-            )}
+            
         </div>
     )
 }

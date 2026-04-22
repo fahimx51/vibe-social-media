@@ -24,6 +24,7 @@ import GetPrevChatUsers from './hooks/GetPrevChatUsers'
 import Search from './pages/Search'
 import GetAllNotification from './hooks/GetAllNotification'
 import Notification from './pages/Notification'
+import { setNotificationData } from './redux/notificationSlice'
 
 export const serverUrl = "http://localhost:8000"
 
@@ -31,6 +32,8 @@ export default function App() {
 
   const { userData, isCheckingAuth } = useSelector(state => state.user);
   const { socket } = useSelector(state => state.socket);
+  const { notificationData } = useSelector(state => state.notification);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -56,7 +59,22 @@ export default function App() {
         dispatch(setSocket(null));
       }
     }
-  }, [userData])
+  }, [userData, dispatch]);
+
+
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNotification = (noti) => {
+
+      dispatch(setNotificationData([noti, ...notificationData]));
+    };
+
+    socket.on("newNotification", handleNotification);
+
+    return () => socket.off("newNotification", handleNotification);
+  }, [socket, dispatch]);
 
   GetCurrentUser();
   GetSuggestedUser();
@@ -98,7 +116,7 @@ export default function App() {
 
       <Route path='/message-area' element={userData ? <MessageArea /> : <Navigate to="/signIn" />} />
       <Route path='/search' element={userData ? <Search /> : <Navigate to="/signIn" />} />
-      <Route path='/notification' element={userData ? <Notification /> : <Navigate to="/signIn" />} />
+      <Route path='/notification' element={userData ? <Notification notificationData={notificationData} /> : <Navigate to="/signIn" />} />
 
     </Routes>
   )

@@ -1,6 +1,8 @@
 import Loop from '../models/loop.model.js';
 import User from '../models/user.model.js';
 import uploadOnCloudinary from '../config/cloudinary.js';
+import { getSocketId, io } from '../socket.js';
+import Notification from '../models/notification.model.js';
 
 export const getAllLoops = async (req, res) => {
     try {
@@ -83,7 +85,7 @@ export const like = async (req, res) => {
             if (loop.author._id != req.userId) {
                 const notification = await Notification.create({
                     sender: req.userId,
-                    receiver: post.author._id,
+                    receiver: loop.author._id,
                     type: 'like',
                     loop: loop._id,
                     message: "liked your loop"
@@ -146,7 +148,7 @@ export const comment = async (req, res) => {
         if (loop.author._id != req.userId) {
             const notification = await Notification.create({
                 sender: req.userId,
-                receiver: post.author._id,
+                receiver: loop.author._id,
                 type: 'comment',
                 loop: loop._id,
                 message: "commented on your loop"

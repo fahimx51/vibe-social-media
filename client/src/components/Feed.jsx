@@ -24,7 +24,7 @@ export default function Feed() {
                 <img src={logo_white} alt="" className='w-20' />
                 <div className='flex items-center gap-[20px]'>
                     <div className='relative'>
-                        <FaRegHeart className='w-[30px] h-[30px] text-white cursor-pointer' />
+                        <FaRegHeart onClick={() => navigate('/notification')} className='w-[30px] h-[30px] text-white cursor-pointer' />
                         {
                             notificationData?.length > 0 && notificationData.some((notification) => notification.isRead == false) && <div className='h-3 w-3 border-1 bg-blue-600 rounded-full absolute top-[0px] right-[0px]'></div>
                         }

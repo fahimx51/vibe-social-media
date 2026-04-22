@@ -1,15 +1,51 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { IoArrowBack } from "react-icons/io5";
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import OnlineUsers from '../components/OnlineUsers';
 import MessageCard from '../components/MessageCard';
+import { setMessages, setPrevChatsUsers } from '../redux/messageSlice';
 
 export default function Messages() {
     const navigate = useNavigate();
     const { userData } = useSelector(state => state.user)
-    const { prevChatUsers } = useSelector(state => state.message)
-    const { onlineUsers } = useSelector(state => state.socket)
+    const { prevChatUsers, messages } = useSelector(state => state.message)
+    const { onlineUsers, socket } = useSelector(state => state.socket)
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (!socket) return;
+
+        socket.on("newMessage", (msg) => {
+            dispatch(setMessages([...messages, msg]));
+
+            if (prevChatUsers) {
+                const updatedSidebar = prevChatUsers.map((chat) => {
+                    const otherParticipant = chat.participants.find(p => p._id !== userData._id);
+
+                    const isTargetChat = otherParticipant?._id === msg.receiver || otherParticipant?._id === msg.sender;
+
+                    if (isTargetChat) {
+                        return {
+                            ...chat,
+                            messages: [msg], 
+                            updatedAt: msg.updatedAt
+                        };
+                    }
+                    return chat;
+                });
+
+                // 3. Sort by most recent
+                const sortedSidebar = [...updatedSidebar].sort((a, b) =>
+                    new Date(b.updatedAt) - new Date(a.updatedAt)
+                );
+
+                dispatch(setPrevChatsUsers(sortedSidebar));
+            }
+        });
+
+        return () => socket.off("newMessage");
+    }, [socket, messages, prevChatUsers, dispatch, userData._id]);
 
     return (
         <div className='w-full min-h-screen flex flex-col gap-[20px] bg-gray-900 p-[10px]'>

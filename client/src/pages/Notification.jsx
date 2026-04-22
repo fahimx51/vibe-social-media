@@ -1,20 +1,24 @@
-import React, { useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import React, { useEffect, useState } from 'react'
 import { IoArrowBack } from "react-icons/io5"
 import { useNavigate } from 'react-router-dom'
 import NotificationCard from '../components/NotificationCard'
 import { serverUrl } from '../App'
 import axios from 'axios'
+import { useDispatch } from 'react-redux'
+import { setNotificationData } from '../redux/notificationSlice'
 
 
-export default function Notification() {
-    const { notificationData } = useSelector(state => state.notification);
+export default function Notification({ notificationData }) {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const [notif] = useState(notificationData);
 
     useEffect(() => {
         const readAllNotifaction = async () => {
             try {
-                await axios.post(`${serverUrl}/api/notification/markAsRead`, {}, { withCredentials: true });
+                const result = await axios.post(`${serverUrl}/api/notification/markAsRead`, {}, { withCredentials: true });
+                dispatch(setNotificationData(result.data));
             }
             catch (error) {
                 console.log(error);
@@ -36,8 +40,8 @@ export default function Notification() {
 
             {/* Notification List */}
             <div className='w-full max-w-[700px] mx-auto flex flex-col mt-2'>
-                {notificationData && notificationData.length > 0 ? (
-                    notificationData.map((noti) => (
+                {notif && notif.length > 0 ? (
+                    notif.map((noti) => (
                         <NotificationCard key={noti?._id} noti={noti} />
                     ))
                 ) : (

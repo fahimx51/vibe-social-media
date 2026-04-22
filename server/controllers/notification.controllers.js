@@ -3,7 +3,7 @@ import Notification from "../models/notification.model.js"
 export const getAllNotification = async (req, res) => {
     try {
         const notification = await Notification.find({ receiver: req.userId })
-            .populate("sender receiver").sort({ updatedAt: -1 });
+            .populate("sender").sort({ updatedAt: -1 });
         res.status(200).json(notification);
     }
     catch (error) {

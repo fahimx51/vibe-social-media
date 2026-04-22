@@ -10,7 +10,7 @@ export default function StoryDp({ userName, profileImage, story }) {
     const { userData } = useSelector(state => state.user)
     const navigate = useNavigate();
 
-    const alreadyViewed = story?.viewers.find(viewer => viewer._id == userData._id);
+    const alreadyViewed = story?.viewers?.find(viewer => viewer._id == userData._id);
 
     const handleViewer = async () => {
         try {
@@ -42,7 +42,7 @@ export default function StoryDp({ userName, profileImage, story }) {
                 </div>
                 {story === null && <FiPlusCircle className='text-gray-900 bg-gray-800 rounded-full absolute bottom-[1px] right-[1px] h-6 w-6 cursor-pointer text-white shadow-sm shadow-white/80' />}
             </div>
-            <div className='text-[14px] text-center truncate w-full text-white'>{userData.userName == userName ? "Your Story" : userName}</div>
+            <div className='text-[14px] text-center truncate w-full text-white'>{userData?.userName == userName ? "Your Story" : userName}</div>
         </div>
     )
 }

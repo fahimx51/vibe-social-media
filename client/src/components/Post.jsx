@@ -30,12 +30,10 @@ export default function Post({ post }) {
         try {
             const result = await axios.post(`${serverUrl}/api/posts/like/${post._id}`, {}, { withCredentials: true });
             const updatedPost = result.data;
-            console.log(updatedPost);
 
             const updatedPosts = postData.map(p => p?._id == post?._id ? updatedPost : p);
 
             dispatch(setPostData(updatedPosts));
-            dispatch(setUserData({ ...userData, savedPosts: updatedPosts }));
         }
         catch (error) {
             console.log("error in like handler", error);
@@ -49,7 +47,7 @@ export default function Post({ post }) {
 
             const updatedPosts = postData.map(p => p?._id == post?._id ? updatedPost : p);
             dispatch(setPostData(updatedPosts));
-            dispatch(setUserData({ ...userData, savedPosts: updatedPosts }));
+            
             setComment("");
         }
         catch (error) {
