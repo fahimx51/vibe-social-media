@@ -140,7 +140,7 @@ export default function Post({ post }) {
                             <button
                                 onClick={() => setIsExpanded(!isExpanded)}
                                 className='text-blue-600 font-bold cursor-pointer hover:underline'
-                            > 
+                            >
                                 {isExpanded ? ' Show less' : ' Read more'}
                             </button>
                         )}
@@ -177,7 +177,9 @@ export default function Post({ post }) {
                             <img src={post?.author?.profileImage || maleDP} alt="" className='w-full h-full object-cover object-center' />
                         </div>
                         <input onChange={(e) => setComment(e.target.value)} value={comment} type="text" placeholder='Write a comment...' className='px-[10px] border-b border-b-gray-400 w-[90%] outline-none h-[40px] ' />
-                        <button onClick={handleComment} className='absolute right-[20px] cursor-pointer'> <FiSend className='h-[25px] w-[25px]' /> </button>
+                        <button onClick={handleComment} disabled={!comment.trim()} className={`${!comment.trim() && 'opacity-40 hover:cursor-not-allowed'} p-2.5 bg-blue-600 rounded-full text-white hover:bg-blue-500 active:scale-90 transition-all`}>
+                            <FiSend size={20} />
+                        </button>
                     </div>
 
                     <div className='w-[90%] mx-auto overflow-auto'>

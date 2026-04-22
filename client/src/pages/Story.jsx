@@ -18,7 +18,6 @@ export default function Story() {
             try {
                 const result = await axios.get(`${serverUrl}/api/story/getByUserName/${userName}`, { withCredentials: true });
                 dispatch(setStoryData(result.data));
-                console.log(result.data);
             }
             catch (error) {
                 console.log(error);

@@ -11,7 +11,6 @@ import { setLoopData } from '../redux/loopSlice';
 import { FiSend } from "react-icons/fi";
 
 export default function LoopCard({ loop }) {
-
     const videoRef = useRef();
     const commentRef = useRef();
     const [isPlaying, setIsPlaying] = useState(true);
@@ -20,43 +19,27 @@ export default function LoopCard({ loop }) {
     const [showHeart, setShowHeart] = useState(false);
     const [showComment, setShowComment] = useState(false);
     const [comment, setComment] = useState("");
-    
-    // New state for Read More functionality
+
     const [isExpanded, setIsExpanded] = useState(false);
-    const MAX_LENGTH = 100; 
+    const MAX_LENGTH = 50;
 
     const { userData } = useSelector(state => state.user);
     const { loopData } = useSelector(state => state.loop);
-
     const dispatch = useDispatch();
 
     useEffect(() => {
-        const currentVideo = videoRef.current;
-
+        const videoElement = videoRef.current;
         const observer = new IntersectionObserver(([entry]) => {
-            const video = videoRef.current;
-            if (!video) return;
-
             if (entry.isIntersecting) {
-                video.play().catch((err) => {
-                    if (err.name !== "AbortError") {
-                        console.error("Playback failed:", err);
-                    }
-                });
+                videoElement?.play().catch(() => { });
             } else {
-                video?.pause();
+                videoElement?.pause();
             }
         }, { threshold: 0.6 });
 
-        if (currentVideo) {
-            observer.observe(currentVideo);
-        }
-
+        if (videoElement) observer.observe(videoElement);
         return () => {
-            if (currentVideo) {
-                observer.unobserve(currentVideo);
-            }
-            observer.disconnect();
+            if (videoElement) observer.unobserve(videoElement);
         };
     }, []);
 
@@ -66,7 +49,6 @@ export default function LoopCard({ loop }) {
                 setShowComment(false);
             }
         }
-
         if (showComment) {
             document.addEventListener("mousedown", handleClickOutside);
         } else {
@@ -87,28 +69,30 @@ export default function LoopCard({ loop }) {
     const handleTimeUpdate = () => {
         const video = videoRef.current;
         if (video) {
-            const parcent = (video.currentTime / video.duration) * 100;
-            setProgress(parcent);
+            const percent = (video.currentTime / video.duration) * 100;
+            setProgress(percent);
         }
     }
 
-    const handleLike = async () => {
+    const handleLike = async (e) => {
+        e?.stopPropagation();
         try {
             const result = await axios.post(`${serverUrl}/api/loops/like/${loop._id}`, {}, { withCredentials: true });
             const updatedLoop = result.data;
-            const updatedLoops = loopData.map(singleLoop => singleLoop?._id == loop?._id ? updatedLoop : singleLoop);
+            const updatedLoops = loopData.map(l => l?._id === loop?._id ? updatedLoop : l);
             dispatch(setLoopData(updatedLoops));
         } catch (error) {
-            console.log("error in like on loops handler", error);
+            console.log("error in like handler", error);
         }
     }
 
     const handleComment = async () => {
+        if (!comment.trim()) return;
         try {
             const result = await axios.post(`${serverUrl}/api/loops/comment/${loop._id}`, { text: comment }, { withCredentials: true });
             const updatedLoop = result.data;
             setComment("");
-            const updatedLoops = loopData.map(singleLoop => singleLoop?._id == loop?._id ? updatedLoop : singleLoop);
+            const updatedLoops = loopData.map(l => l?._id === loop?._id ? updatedLoop : l);
             dispatch(setLoopData(updatedLoops));
         } catch (error) {
             console.log("error in comment handler", error);
@@ -122,93 +106,125 @@ export default function LoopCard({ loop }) {
     };
 
     return (
-        <div className='w-full h-screen md:w-[480px] flex items-center justify-center border-l-2 border-r-2 border-gray-800 relative overflow-hidden'>
-            {/* Heart Animation */}
-            <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none'>
-                {showHeart && <GoHeartFill className='heart-animation h-[100px] w-[100px] text-red-400 drop-shadow-2xl' />}
+        <div className='w-full h-screen lg:w-[480px] flex items-center justify-center border-x-2 border-gray-800 relative overflow-hidden bg-black'>
+
+            {/* Video Background */}
+            <video
+                onTimeUpdate={handleTimeUpdate}
+                onClick={handleClick}
+                ref={videoRef}
+                onDoubleClick={handleLikeOnDoubleClick}
+                autoPlay
+                muted={isMute}
+                loop
+                src={loop?.media}
+                className='w-full h-full object-contain'
+            />
+
+            {/* Interaction UI Layer (Username, Caption, Likes) */}
+            {/* This layer fades out when comments are open to prevent conflicts */}
+            <div className={`w-full absolute bottom-10 px-4 flex justify-between items-end z-10 transition-all duration-300 ${showComment ? 'opacity-0 pointer-events-none translate-y-5' : 'opacity-100 pointer-events-auto translate-y-0'}`}>
+
+                {/* Left Side: Profile & Caption */}
+                <div className='flex-1 pr-16'>
+                    <div className='flex items-center gap-3 mb-3'>
+                        <div className='w-11 h-11 border-2 border-blue-400 rounded-full overflow-hidden shrink-0'>
+                            <img src={loop?.author?.profileImage || maleDP} alt="" className='w-full h-full object-cover' />
+                        </div>
+                        <span className='text-white font-bold text-base truncate max-w-[120px]'>{loop?.author?.userName}</span>
+                        {userData?._id !== loop?.author?._id && (
+                            <FollowButton targetUserId={loop?.author?._id} tailwind={'px-3 py-1 text-white border border-white rounded-lg text-xs hover:bg-white hover:text-black transition-all'} />
+                        )}
+                    </div>
+
+                    <div className='text-white text-sm md:text-base leading-relaxed'>
+                        <span className='break-words'>
+                            {loop?.caption?.length > MAX_LENGTH && !isExpanded
+                                ? `${loop.caption.substring(0, MAX_LENGTH)}... `
+                                : loop?.caption}
+                        </span>
+                        {loop?.caption?.length > MAX_LENGTH && (
+                            <button
+                                onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }}
+                                className='text-blue-500 hover:cursor-pointer font-bold ml-1  transition-colors'
+                            >
+                                {isExpanded ? 'show less' : 'see more'}
+                            </button>
+                        )}
+                    </div>
+                </div>
+
+                {/* Right Side: Like & Comment Icons */}
+                <div className='flex flex-col gap-5 items-center pb-2'>
+                    <div className='flex flex-col items-center'>
+                        <div onClick={handleLike} className='p-2 bg-black/10 rounded-full cursor-pointer active:scale-90 transition-transform'>
+                            {loop?.likes.includes(userData?._id) ?
+                                <GoHeartFill className='w-8 h-8 md:w-9 md:h-9 text-red-500' /> :
+                                <GoHeart className='w-8 h-8 md:w-9 md:h-9 text-white' />
+                            }
+                        </div>
+                        <span className='text-white text-xs font-semibold mt-1'>{loop?.likes.length}</span>
+                    </div>
+
+                    <div className='flex flex-col items-center'>
+                        <div onClick={(e) => { e.stopPropagation(); setShowComment(true); }} className='p-2 bg-black/10 rounded-full cursor-pointer active:scale-90 transition-transform'>
+                            <MdOutlineComment className='w-8 h-8 md:w-9 md:h-9 text-white' />
+                        </div>
+                        <span className='text-white text-xs font-semibold mt-1'>{loop?.comments.length}</span>
+                    </div>
+                </div>
             </div>
 
-            {/* Comment Sidebar/Bottom Sheet */}
-            <div ref={commentRef} className={`absolute z- bottom-0 w-full h-[500px] p-[10px] rounded-t-4xl bg-gray-800/90 transform transition-transform duration-500 ease-in-out left-0 shadow-2xl shadow-black ${showComment ? "translate-y-0" : "translate-y-[100%]"}`}>
-                <h1 className='text-center text-[20px] text-white font-semibold py-2'>Comments</h1>
-                <div className='w-full h-[350px] overflow-y-auto flex flex-col gap-[20px] custom-scrollbar px-2'>
+            {/* Comment Drawer (Sits on top of everything else) */}
+            <div ref={commentRef} className={`absolute z- bottom-0 w-full h-[500px] p-4 rounded-t-3xl bg-gray-900/95 backdrop-blur-md transform transition-transform duration-500 ease-in-out left-0 shadow-2xl ${showComment ? "translate-y-0" : "translate-y-full"}`}>
+                <div className='w-12 h-1.5 bg-gray-700 rounded-full mx-auto mb-4 cursor-pointer' onClick={() => setShowComment(false)}></div>
+                <h1 className='text-center text-xl text-white font-bold mb-4'>Comments</h1>
+
+                <div className='w-full h-[320px] overflow-y-auto flex flex-col gap-4 custom-scrollbar px-2'>
                     {loop?.comments.length === 0 ? (
-                        <div className='flex h-full w-full items-center justify-center text-white/40 text-xl font-semibold'>No Comment</div>
+                        <div className='flex h-full w-full items-center justify-center text-gray-500'>No comments yet</div>
                     ) : (
                         loop?.comments.map((com, index) => (
-                            <div key={index} className='w-full flex flex-col gap-[5px] border-b border-gray-700/50 pb-[10px]'>
-                                <div className='flex items-center gap-[15px]'>
-                                    <div className='w-8 h-8 border border-blue-400 rounded-full overflow-hidden'>
+                            <div key={index} className='w-full border-b border-gray-800/50 pb-3'>
+                                <div className='flex items-center gap-3 mb-1'>
+                                    <div className='w-8 h-8 rounded-full border border-blue-400 overflow-hidden shrink-0'>
                                         <img src={com?.author?.profileImage || maleDP} alt="" className='w-full h-full object-cover' />
                                     </div>
-                                    <div className='font-semibold text-white text-sm'>{com?.author?.userName}</div>
+                                    <span className='font-semibold text-white text-sm'>{com?.author?.userName}</span>
                                 </div>
-                                <div className='text-gray-300 pl-11 text-sm'>{com.text}</div>
+                                <p className='text-gray-300 text-sm ml-11 break-words'>{com.text}</p>
                             </div>
                         ))
                     )}
                 </div>
-                <div className='w-full h-[80px] absolute bottom-0 flex items-center justify-between px-[20px] bg-gray-800'>
-                    <input onChange={(e) => setComment(e.target.value)} value={comment} type="text" placeholder='Write a comment...' className='bg-transparent text-white border-b border-gray-400 w-[85%] outline-none h-[40px]' />
-                    <button onClick={handleComment} className='cursor-pointer'><FiSend className='h-[25px] w-[25px] text-white' /></button>
+
+                {/* Fixed Comment Input at the bottom of the drawer */}
+                <div className='absolute bottom-4 left-0 w-full px-4 flex items-center gap-3 bg-transparent'>
+                    <input
+                        onChange={(e) => setComment(e.target.value)}
+                        value={comment}
+                        disable={comment.trim()}
+                        type="text"
+                        placeholder='Add a comment...'
+                        className='flex-1 bg-gray-800 text-white rounded-full px-4 py-2.5 outline-none border border-gray-700 focus:border-blue-500 transition-all'
+                    />
+                    <button onClick={handleComment} className={`${!comment.trim() && 'opacity-40 hover:cursor-not-allowed' } p-2.5 bg-blue-600 rounded-full text-white hover:bg-blue-500 active:scale-90 transition-all`}>
+                        <FiSend size={20} />
+                    </button>
                 </div>
             </div>
 
-            {/* Video Element */}
-            <video onTimeUpdate={handleTimeUpdate} onClick={handleClick} ref={videoRef} onDoubleClick={handleLikeOnDoubleClick} autoPlay muted={isMute} loop src={loop?.media} className='w-full object-cover' />
-            
-            {/* Mute/Unmute Toggle */}
-            <div onClick={() => setIsMute(prev => !prev)} className='absolute top-[50px] right-[20px] z-10 cursor-pointer'>
-                {isMute ? <SlVolumeOff className='w-[30px] h-[30px] text-white' /> : <SlVolume2 className='w-[30px] h-[30px] text-white' />}
+            {/* Other Overlays (Mute, Heart, Progress) */}
+            <div onClick={() => setIsMute(prev => !prev)} className='absolute top-20 right-5 z-20 p-2 bg-black/20 rounded-full cursor-pointer'>
+                {isMute ? <SlVolumeOff className='w-6 h-6 text-white' /> : <SlVolume2 className='w-6 h-6 text-white' />}
             </div>
 
-            {/* Progress Bar */}
-            <div className='absolute bottom-0 left-0 w-full h-[5px] bg-gray-600/50'>
-                <div className='h-full bg-white transition-all duration-300 ease-linear' style={{ width: `${progress}%` }}></div>
+            <div className='absolute bottom-0 left-0 w-full h-1 bg-gray-800 z-30'>
+                <div className='h-full bg-white transition-all duration-300' style={{ width: `${progress}%` }}></div>
             </div>
 
-            {/* User Info & Caption Section */}
-            <div className='w-full absolute bottom-[30px] px-[15px] z-10'>
-                <div className='flex items-center gap-[15px] mb-3'>
-                    <div className='w-12 h-12 border-2 border-blue-400 rounded-full overflow-hidden'>
-                        <img src={loop?.author?.profileImage || maleDP} alt="" className='w-full h-full object-cover' />
-                    </div>
-                    <div className='text-white font-semibold truncate max-w-[120px]'>{loop?.author?.userName}</div>
-                    {userData?._id != loop?.author?._id && <FollowButton targetUserId={loop?.author?._id} tailwind={'px-3 py-1 text-white border text-xs rounded-xl border-white hover:bg-white hover:text-black transition-all'} />}
-                </div>
-
-                {/* Read More Caption Implementation */}
-                <div className='text-gray-200 text-sm md:text-base pr-[60px]'>
-                    <span>
-                        {loop?.caption?.length > MAX_LENGTH && !isExpanded
-                            ? `${loop.caption.substring(0, MAX_LENGTH)}... `
-                            : loop?.caption}
-                    </span>
-                    {loop?.caption?.length > MAX_LENGTH && (
-                        <button
-                            onClick={() => setIsExpanded(!isExpanded)}
-                            className='text-white font-bold cursor-pointer hover:underline'
-                        >
-                            {isExpanded ? ' Show less' : ' Read more'}
-                        </button>
-                    )}
-                </div>
-            </div>
-
-            {/* Floating Interaction Sidebar */}
-            <div className='absolute flex flex-col right-3 gap-[20px] text-white bottom-[120px] z-20 items-center'>
-                <div className='flex flex-col items-center'>
-                    <div onClick={handleLike}>
-                        {loop?.likes.includes(userData?._id) ? <GoHeartFill className='h-[35px] w-[35px] text-red-500 cursor-pointer' /> : <GoHeart className='h-[35px] w-[35px] cursor-pointer' />}
-                    </div>
-                    <span className='text-xs mt-1'>{loop?.likes.length}</span>
-                </div>
-                <div className='flex flex-col items-center'>
-                    <div onClick={() => setShowComment(true)}>
-                        <MdOutlineComment className='h-[35px] w-[35px] cursor-pointer' />
-                    </div>
-                    <span className='text-xs mt-1'>{loop?.comments.length}</span>
-                </div>
+            <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none'>
+                {showHeart && <GoHeartFill className='heart-animation h-[100px] w-[100px] text-red-500 drop-shadow-2xl' />}
             </div>
         </div>
     )
