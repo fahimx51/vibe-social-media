@@ -27,7 +27,7 @@ import Notification from './pages/Notification'
 import { setNotificationData } from './redux/notificationSlice'
 import { Toaster } from 'react-hot-toast'
 
-export const serverUrl = "http://localhost:8000"
+export const serverUrl = import.meta.env.VITE_SERVER_URL;
 
 export default function App() {
 
@@ -106,9 +106,9 @@ export default function App() {
         reverseOrder={false}
         toastOptions={{
           style: {
-            background: '#f3f4f6', 
-            color: '#111827',      
-            border: '1px solid #e5e7eb', 
+            background: '#f3f4f6',
+            color: '#111827',
+            border: '1px solid #e5e7eb',
             fontWeight: '500',
             fontSize: '15px',
             padding: '12px 24px',
