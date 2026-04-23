@@ -40,7 +40,7 @@ export const uploadStory = async (req, res) => {
 export const viewStory = async (req, res) => {
     try {
         const storyId = req.params.storyId;
-        
+
         const story = await Story.findById(storyId);
 
         if (!story) {
@@ -96,12 +96,17 @@ export const getStoryByUserName = async (req, res) => {
 export const getAllStory = async (req, res) => {
     try {
         const currUser = await User.findById(req.userId);
+        if (!currUser) return res.status(404).json({ message: "User not found" });
+
         const followingIds = currUser.following;
 
+        const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
         const stories = await Story.find({
-            author: { $in: followingIds }
+            author: { $in: followingIds },
+            createdAt: { $gte: twentyFourHoursAgo }
         })
-            .populate("viewers author")
+            .populate("viewers author", "name userName profileImage") 
             .sort({ createdAt: -1 });
 
         res.status(200).json(stories);
