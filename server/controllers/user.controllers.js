@@ -82,7 +82,7 @@ export const editProfile = async (req, res) => {
         let profileImage;
 
         if (req.file) {
-            profileImage = await uploadOnCloudinary(req.file.path);
+            profileImage = await uploadOnCloudinary(req.file.buffer, req.file.mimetype);
         }
 
         user.name = name;

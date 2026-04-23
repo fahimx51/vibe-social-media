@@ -14,7 +14,7 @@ export const uploadStory = async (req, res) => {
 
         let media;
         if (req.file) {
-            media = await uploadOnCloudinary(req.file.path);
+            media = await uploadOnCloudinary(req.file.buffer, req.file.mimetype);
         }
         else {
             res.status(400).json({ message: "Media is required" });
@@ -106,7 +106,7 @@ export const getAllStory = async (req, res) => {
             author: { $in: followingIds },
             createdAt: { $gte: twentyFourHoursAgo }
         })
-            .populate("viewers author", "name userName profileImage") 
+            .populate("viewers author", "name userName profileImage")
             .sort({ createdAt: -1 });
 
         res.status(200).json(stories);

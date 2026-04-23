@@ -33,7 +33,7 @@ export const uploadLoop = async (req, res) => {
         let media;
 
         if (req.file) {
-            media = await uploadOnCloudinary(req.file.path);
+            media = await uploadOnCloudinary(req.file.buffer, req.file.mimetype);
         }
         else {
             return res.status(400).json({ message: "Media is required" });

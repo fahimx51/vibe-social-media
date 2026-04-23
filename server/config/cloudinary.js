@@ -4,25 +4,34 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const uploadOnCloudinary = async (file) => {
+const uploadOnCloudinary = async (fileSource, mimetype = null) => {
     try {
-        cloudinary.config({
-            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-            api_key: process.env.CLOUDINARY_API_KEY,
-            api_secret: process.env.CLOUDINARY_API_SECRET
+        if (!fileSource) return null;
+
+        let uploadTarget = fileSource;
+
+        if (Buffer.isBuffer(fileSource)) {
+            const fileBase64 = fileSource.toString('base64');
+            uploadTarget = `data:${mimetype};base64,${fileBase64}`;
+        }
+
+        const result = await cloudinary.uploader.upload(uploadTarget, {
+            resource_type: 'auto',
+            folder: 'vibe_uploads'
         });
 
-        const result = await cloudinary.uploader.upload(file, {
-            resource_type: 'auto'
-        });
-
-        fs.unlinkSync(file);
+        if (typeof fileSource === 'string' && fs.existsSync(fileSource)) {
+            fs.unlinkSync(fileSource);
+        }
 
         return result.secure_url;
     }
     catch (error) {
-        fs.unlinkSync(file);
-        console.log("Error in cloundinary");
+        if (typeof fileSource === 'string' && fs.existsSync(fileSource)) {
+            fs.unlinkSync(fileSource);
+        }
+        console.error("Cloudinary Error:", error);
+        return null;
     }
 }
 
