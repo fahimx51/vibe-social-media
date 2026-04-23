@@ -27,7 +27,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.get('/', (req, res) => {
-    res.send('<h1>Server is Live!</h1>');
+    res.send('<h1>Vibe server is Live!</h1>');
 });
 
 app.use("/api/auth", authRouter);
