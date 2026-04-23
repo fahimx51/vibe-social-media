@@ -36,7 +36,7 @@ export const uploadPost = async (req, res) => {
 
 export const getAllPosts = async (req, res) => {
     try {
-        const posts = await Post.find({}).populate("author", "name userName profileImage").populate("comments.author", "name userName profileImage").sort({ createAt: -1 });
+        const posts = await Post.find({}).populate("author", "name userName profileImage").populate("comments.author", "name userName profileImage").sort({ createdAt: -1 });
         res.status(200).json(posts);
     }
     catch (error) {
