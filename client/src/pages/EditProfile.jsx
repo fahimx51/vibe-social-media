@@ -27,7 +27,7 @@ export default function EditProfile() {
     const [loading, setLoading] = useState(false);
 
     const handleImageChange = (e) => {
-        const file = e.target.files;
+        const file = e.target.files[0];
         if (file) {
             setBackendImage(file);
             setFrontendImage(URL.createObjectURL(file));
@@ -37,7 +37,7 @@ export default function EditProfile() {
     const handleEditProfile = async () => {
         setLoading(true);
         const toastId = toast.loading("Updating your vibe...");
-        
+
         try {
             const formData = new FormData();
             formData.append('name', name);
@@ -51,7 +51,7 @@ export default function EditProfile() {
             }
 
             const result = await axios.post(`${serverUrl}/api/user/editProfile`, formData, { withCredentials: true });
-            
+
             dispatch(setProfileData(result.data));
             dispatch(setUserData(result.data));
 
@@ -71,9 +71,9 @@ export default function EditProfile() {
         <div className='w-full min-h-screen bg-gray-950 flex items-center flex-col gap-6 pb-10'>
             {/* Header */}
             <div className='w-full h-[80px] flex items-center gap-5 px-5'>
-                <IoArrowBack 
-                    onClick={() => navigate(`/profile/${userData?.userName}`)} 
-                    className='text-white cursor-pointer w-8 h-8 hover:text-blue-400 transition-colors' 
+                <IoArrowBack
+                    onClick={() => navigate(`/profile/${userData?.userName}`)}
+                    className='text-white cursor-pointer w-8 h-8 hover:text-blue-400 transition-colors'
                 />
                 <h1 className='text-white text-xl font-bold uppercase tracking-wider'>Edit Profile</h1>
             </div>
@@ -94,7 +94,7 @@ export default function EditProfile() {
 
             {/* Form Fields */}
             <div className='w-[90%] max-w-[600px] flex flex-col gap-5'>
-                
+
                 {/* Name */}
                 <div className='flex flex-col gap-2'>
                     <label className='text-gray-400 text-xs font-bold uppercase ml-2'>Full Name</label>
@@ -147,25 +147,25 @@ export default function EditProfile() {
                     <label className='text-gray-400 text-xs font-bold uppercase ml-2'>Gender</label>
                     <div className='flex gap-4'>
                         <label className={`flex-1 flex items-center justify-center h-14 rounded-2xl cursor-pointer border-2 transition-all ${gender === 'Male' ? 'border-blue-500 bg-blue-500/10 text-white' : 'border-gray-800 bg-gray-900 text-gray-500'}`}>
-                            <input 
-                                type="radio" 
-                                name="gender" 
-                                value="Male" 
-                                checked={gender === 'Male'} 
-                                onChange={(e) => setGender(e.target.value)} 
-                                className="hidden" 
+                            <input
+                                type="radio"
+                                name="gender"
+                                value="Male"
+                                checked={gender === 'Male'}
+                                onChange={(e) => setGender(e.target.value)}
+                                className="hidden"
                             />
                             <span className='font-bold'>Male</span>
                         </label>
 
                         <label className={`flex-1 flex items-center justify-center h-14 rounded-2xl cursor-pointer border-2 transition-all ${gender === 'Female' ? 'border-pink-500 bg-pink-500/10 text-white' : 'border-gray-800 bg-gray-900 text-gray-500'}`}>
-                            <input 
-                                type="radio" 
-                                name="gender" 
-                                value="Female" 
-                                checked={gender === 'Female'} 
-                                onChange={(e) => setGender(e.target.value)} 
-                                className="hidden" 
+                            <input
+                                type="radio"
+                                name="gender"
+                                value="Female"
+                                checked={gender === 'Female'}
+                                onChange={(e) => setGender(e.target.value)}
+                                className="hidden"
                             />
                             <span className='font-bold'>Female</span>
                         </label>
@@ -173,8 +173,8 @@ export default function EditProfile() {
                 </div>
 
                 {/* Action Button */}
-                <button 
-                    onClick={handleEditProfile} 
+                <button
+                    onClick={handleEditProfile}
                     disabled={loading}
                     className='mt-4 w-full h-14 bg-white hover:bg-gray-200 text-black font-bold rounded-2xl transition-all shadow-lg active:scale-95 disabled:opacity-50 flex items-center justify-center'
                 >
