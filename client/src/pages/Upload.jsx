@@ -10,6 +10,7 @@ import { setPostData } from '../redux/postSlice';
 import { setStoryData } from '../redux/storySlice';
 import { setLoopData } from '../redux/loopSlice';
 import { ClipLoader } from "react-spinners"
+import toast from 'react-hot-toast';
 
 export default function Upload() {
 
@@ -53,7 +54,7 @@ export default function Upload() {
             const result = await axios.post(`${serverUrl}/api/posts/upload`, formData, { withCredentials: true });
 
             dispatch(setPostData([...postData, result.data]));
-
+            toast.success("Captured and posted. Looks good!")
             navigate('/');
         }
         catch (error) {
@@ -73,6 +74,7 @@ export default function Upload() {
             const result = await axios.post(`${serverUrl}/api/story/upload`, formData, { withCredentials: true });
 
             dispatch(setStoryData([...storyData, result.data]))
+            toast.success("Story added! It’ll be up for 24 hours.")
             navigate('/');
         }
         catch (error) {
@@ -94,7 +96,7 @@ export default function Upload() {
             const result = await axios.post(`${serverUrl}/api/loops/upload`, formData, { withCredentials: true });
 
             dispatch(setLoopData([...loopData, result.data]));
-
+            toast.success("Loop published! Time to trend.")
             navigate('/');
         }
         catch (error) {
